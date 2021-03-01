@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.3)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
+include(cmake/platform.cmake)
 
 project(RTCLI_VM VERSION 0.0.1)
 
@@ -71,11 +72,22 @@ file(GLOB_RECURSE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.inl
 )
+file(GLOB_RECURSE 
+    PLATFORM_SRC_FILES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${RTCLI_PLATFORM}/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${RTCLI_PLATFORM}/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${RTCLI_PLATFORM}/*.hxx
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${RTCLI_PLATFORM}/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${RTCLI_PLATFORM}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${RTCLI_PLATFORM}/*.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${RTCLI_PLATFORM}/*.inl
+)
 
 if(RTCLI_VM_LIB)
-    add_library(RTCLI_VM STATIC ${SRC_FILES} ${IMPL_SRC_FILES})
+    add_library(RTCLI_VM STATIC ${SRC_FILES} ${PLATFORM_SRC_FILES})
 else()
-    add_library(RTCLI_VM SHARED ${SRC_FILES} ${IMPL_SRC_FILES})
+    add_library(RTCLI_VM SHARED ${SRC_FILES} ${PLATFORM_SRC_FILES})
 endif()
 
 target_include_directories(RTCLI_VM  

@@ -15,10 +15,7 @@ typedef struct rtcli_object
 
 namespace RTCLI::System
 {
-    class RTCLI_API __object : public ::rtcli_object
-    {
-
-    };
+    using __object = ::rtcli_object;
 };
 
 #endif

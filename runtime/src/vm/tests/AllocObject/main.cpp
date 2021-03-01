@@ -1,6 +1,6 @@
 #include <iostream>
 #include "rtcli/vm/gc.h"
-#include "rtcli/internal/log.h"
+#include "rtcli/detail/log.h"
 
 int main()
 {
