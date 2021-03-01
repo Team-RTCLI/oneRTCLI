@@ -24,6 +24,14 @@
 
 #define MAX_CALLBACKS 32
 
+#if defined(RTCLI_COMPILER_CLANG)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(RTCLI_COMPILER_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4102)
+#endif
+
 typedef struct {
   log_LogFn fn;
   void *udata;
@@ -166,3 +174,10 @@ void log_log(int level, const char *file, int line, const char *fmt, ...) {
 
   unlock();
 }
+
+
+#if defined(RTCLI_COMPILER_CLANG)
+#pragma clang diagnostic pop
+#elif defined(RTCLI_COMPILER_MSVC)
+#pragma warning(pop)
+#endif
