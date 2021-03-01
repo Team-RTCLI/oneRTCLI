@@ -1,0 +1,83 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Directory.Build.props" />
+
+  <PropertyGroup>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <GenerateResxSourceOmitGetResourceString>true</GenerateResxSourceOmitGetResourceString>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <EnsureRuntimePackageDependencies>false</EnsureRuntimePackageDependencies>
+    <TargetFramework>$(NetCoreAppCurrent)</TargetFramework>
+
+    <!-- Force System.Private.CoreLib.dll into a special IL output directory -->
+    <OutputPath>$(RuntimeBinDir)/IL/</OutputPath>
+    <Configurations>Debug;Release;Checked</Configurations>
+    <Platforms>x64;x86;arm;arm64</Platforms>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+
+    <ILLinkTrimAssembly>true</ILLinkTrimAssembly>
+    <ILLinkTrimXml>$(IntermediateOutputPath)System.Private.CoreLib.xml</ILLinkTrimXml>
+    <ILLinkDirectory>$(MSBuildThisFileDirectory)src\ILLink\</ILLinkDirectory>
+
+    <FeaturePortableThreadPool>true</FeaturePortableThreadPool>
+    <FeatureSharedLowLevelLock>true</FeatureSharedLowLevelLock>
+  </PropertyGroup>
+
+  <!-- Note that various places in SPCL depend on this resource name i.e. TplEventSource -->
+  <ItemGroup Label="Embedded Resources">
+    <EmbeddedResource Include="$(LibrariesProjectRoot)System.Private.CoreLib\src\Resources\Strings.resx">
+      <GenerateSource>true</GenerateSource>
+      <ClassName>System.SR</ClassName>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <!-- Platform specific properties -->
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>$(DefineConstants);TARGET_AMD64</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x86'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'arm'">
+    <PlatformTarget>arm</PlatformTarget>
+    <DefineConstants>$(DefineConstants);TARGET_ARM</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'arm64'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DefineConstants>$(DefineConstants);TARGET_ARM64</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Configuration specific properties -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' or '$(Configuration)' == 'Checked'">
+    <Optimize Condition="'$(Optimize)' == '' and '$(Configuration)' == 'Debug'">false</Optimize>
+    <Optimize Condition="'$(Optimize)' == '' and '$(Configuration)' == 'Checked'">true</Optimize>
+    <DefineConstants>_LOGGING;DEBUG;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize Condition="'$(Optimize)' == ''">true</Optimize>
+  </PropertyGroup>
+
+  <!-- Assembly attributes -->
+  <PropertyGroup>
+    <Description>$(AssemblyName)</Description>
+  </PropertyGroup>
+
+  <!--
+    Helper Paths
+  -->
+  <PropertyGroup>
+    <BclSourcesRoot>$(MSBuildThisFileDirectory)src</BclSourcesRoot>
+  </PropertyGroup>
+
+  <!-- Compilation options -->
+  <Import Project="../clr.featuredefines.props" />
+
+  <!-- Sources -->
+  <ItemGroup>
+    <Compile Include="$(BclSourcesRoot)\System\Currency.cs" />
+  </ItemGroup>
+
+</Project>
