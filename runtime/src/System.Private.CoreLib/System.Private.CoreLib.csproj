@@ -7,7 +7,7 @@
     <GenerateResxSourceOmitGetResourceString>true</GenerateResxSourceOmitGetResourceString>
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
     <EnsureRuntimePackageDependencies>false</EnsureRuntimePackageDependencies>
-    <TargetFramework>$(NetCoreAppCurrent)</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
 
     <!-- Force System.Private.CoreLib.dll into a special IL output directory -->
     <OutputPath>$(RuntimeBinDir)/IL/</OutputPath>
@@ -71,6 +71,7 @@
   <PropertyGroup>
     <BclSourcesRoot>$(MSBuildThisFileDirectory)src</BclSourcesRoot>
   </PropertyGroup>
+  <Import Project="..\libraries\System.Private.CoreLib\src\System.Private.CoreLib.Shared.projitems" Label="Shared" />
 
   <!-- Compilation options -->
   <Import Project="../clr.featuredefines.props" />
@@ -78,6 +79,9 @@
   <!-- Sources -->
   <ItemGroup>
     <Compile Include="$(BclSourcesRoot)\System\Currency.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libraries\System.Private.CoreLib\generators\System.Private.CoreLib.Generators.csproj" />
   </ItemGroup>
 
 </Project>
