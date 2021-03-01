@@ -21,6 +21,8 @@
  */
 #define DLL_IMPLEMENTATION
 #include "rtcli/internal/log.h"
+#include <time.h>
+#include <stdarg.h>
 
 #define MAX_CALLBACKS 32
 
