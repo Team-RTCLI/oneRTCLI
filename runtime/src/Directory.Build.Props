@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <LibrariesProjectRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', 'src', 'libraries'))</LibrariesProjectRoot>
+    <LibrariesProjectRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', 'libraries'))</LibrariesProjectRoot>
     <CommonPath>$([MSBuild]::NormalizeDirectory('$(LibrariesProjectRoot)', 'Common', 'src'))</CommonPath>
   </PropertyGroup>
 
