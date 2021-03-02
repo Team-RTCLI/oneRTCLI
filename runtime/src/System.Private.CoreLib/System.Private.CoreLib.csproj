@@ -20,7 +20,7 @@
     <ILLinkDirectory>$(MSBuildThisFileDirectory)src\ILLink\</ILLinkDirectory>
 
     <FeaturePortableThreadPool>true</FeaturePortableThreadPool>
-    <FeatureSharedLowLevelLock>true</FeatureSharedLowLevelLock>
+    <FeatureSharedLowLevelLock>false</FeatureSharedLowLevelLock>
   </PropertyGroup>
 
   <!-- Note that various places in SPCL depend on this resource name i.e. TplEventSource -->
@@ -75,7 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug' or '$(Configuration)' == 'Checked'">
     <Optimize Condition="'$(Optimize)' == '' and '$(Configuration)' == 'Debug'">false</Optimize>
     <Optimize Condition="'$(Optimize)' == '' and '$(Configuration)' == 'Checked'">true</Optimize>
-    <DefineConstants>_LOGGING;DEBUG;$(DefineConstants)</DefineConstants>
+    <DefineConstants>DEBUG;_LOGGING;RTCLI;NETCOREAPP;SYSTEM_PRIVATE_CORELIB;MONO_FEATURE_SRE;MONO</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <Optimize Condition="'$(Optimize)' == ''">true</Optimize>
@@ -92,20 +92,21 @@
   <PropertyGroup>
     <BclSourcesRoot>$(MSBuildThisFileDirectory)src</BclSourcesRoot>
   </PropertyGroup>
-  <Import Project="..\libraries\System.Private.CoreLib\src\System.Private.CoreLib.Shared.projitems" Label="Shared" />
+
+  <!-- Sources -->
+  <!-- ILLinker settings -->
+  <PropertyGroup>
+    <ILLinkTrimAssembly>true</ILLinkTrimAssembly>
+    <ILLinkDirectory>$(MSBuildThisFileDirectory)src\ILLink\</ILLinkDirectory>
+  </PropertyGroup>
 
   <!-- Sources -->
   <ItemGroup>
-    <Compile Include="$(BclSourcesRoot)\System\Currency.cs" />
-    <Compile Include="src\System\ValueType.cs" />
   </ItemGroup>
   <Import Project="$(LibrariesProjectRoot)\System.Private.CoreLib\src\System.Private.CoreLib.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
     <ProjectReference Include="$(LibrariesProjectRoot)\System.Private.CoreLib\generators\System.Private.CoreLib.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\libraries\System.Private.CoreLib\generators\System.Private.CoreLib.Generators.csproj" />
   </ItemGroup>
 
 </Project>
