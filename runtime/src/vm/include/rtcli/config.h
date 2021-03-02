@@ -300,6 +300,14 @@
 #define RTCLI_IL_FUNC RTCLI_FORCEINLINE
 #endif
 
+#ifndef RTCLI_ZERO_LEN_ARRAY
+#ifdef __GNUC__
 #define RTCLI_ZERO_LEN_ARRAY 0
+#else
+#define RTCLI_ZERO_LEN_ARRAY 1
+#endif
+#endif
 
-
+#ifndef INTERNAL_CALL
+#define INTERNAL_CALL
+#endif 

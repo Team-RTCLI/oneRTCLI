@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 #define DLL_IMPLEMENTATION
-#include "rtcli/internal/log.h"
+#include "rtcli/detail/log.h"
 #include <time.h>
 #include <stdarg.h>
 

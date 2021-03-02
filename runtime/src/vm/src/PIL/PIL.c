@@ -1,5 +1,5 @@
 #define DLL_IMPLEMENTATION
-#include "rtcli/internal/log.h"
+#include "rtcli/detail/log.h"
 #include "rtcli/PIL.h"
 #include <stdlib.h>
 

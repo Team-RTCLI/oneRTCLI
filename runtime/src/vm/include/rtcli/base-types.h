@@ -21,12 +21,24 @@ typedef int64_t rtcli_i64;
 typedef float rtcli_f32;
 typedef double rtcli_f64;
 typedef intptr_t rtcli_intptr;
+typedef uintptr_t rtcli_uintptr;
 typedef size_t rtcli_usize;
 typedef ptrdiff_t rtcli_isize;
 typedef void rtcli_void;
 
 typedef rtcli_u32 rtcli_rc;
 typedef rtcli_u32 rtcli_object_flags;
+
+/* Alignment for VMArray.vector */
+#if defined(_AIX)
+/*
+ * HACK: doubles in structs always align to 4 on AIX... even on 64-bit,
+ * which is bad for aligned usage like what System.Array.FastCopy does
+ */
+typedef rtcli_u64 rtcli_64bit_aligned;
+#else
+typedef double rtcli_64bit_aligned;
+#endif
 
 #ifdef RTCLI_COMPILER_MSVC
     typedef wchar_t rtcli_char;
