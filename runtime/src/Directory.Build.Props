@@ -1,8 +1,24 @@
 <Project>
 
+  <Import Project="..\Directory.Build.props" />
+  
+  <PropertyGroup>
+    <InferPlatformFromTargetArchitecture>true</InferPlatformFromTargetArchitecture>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$([MSBuild]::NormalizeDirectory('$(ArtifactsObjDir)', 'rtcli', '$(MSBuildProjectName)'))</BaseIntermediateOutputPath>
+    <IntermediateOutputPath Condition="'$(PlatformName)' == 'AnyCPU'">$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
+    <IntermediateOutputPath Condition="'$(PlatformName)' != 'AnyCPU'">$(BaseIntermediateOutputPath)$(PlatformName)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <LibrariesProjectRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', 'libraries'))</LibrariesProjectRoot>
     <CommonPath>$([MSBuild]::NormalizeDirectory('$(LibrariesProjectRoot)', 'Common', 'src'))</CommonPath>
   </PropertyGroup>
 
+  <!-- Output paths -->
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
 </Project>

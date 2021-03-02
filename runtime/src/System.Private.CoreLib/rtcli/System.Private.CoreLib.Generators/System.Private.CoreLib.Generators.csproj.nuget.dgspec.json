@@ -1,0 +1,70 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Sakura\\oneRTCLI\\runtime\\src\\libraries\\System.Private.CoreLib\\generators\\System.Private.CoreLib.Generators.csproj": {}
+  },
+  "projects": {
+    "C:\\Sakura\\oneRTCLI\\runtime\\src\\libraries\\System.Private.CoreLib\\generators\\System.Private.CoreLib.Generators.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Sakura\\oneRTCLI\\runtime\\src\\libraries\\System.Private.CoreLib\\generators\\System.Private.CoreLib.Generators.csproj",
+        "projectName": "System.Private.CoreLib.Generators",
+        "projectPath": "C:\\Sakura\\oneRTCLI\\runtime\\src\\libraries\\System.Private.CoreLib\\generators\\System.Private.CoreLib.Generators.csproj",
+        "packagesPath": "C:\\Users\\Dev1\\.nuget\\packages\\",
+        "outputPath": "C:\\Sakura\\oneRTCLI\\runtime\\src\\System.Private.CoreLib\\rtcli\\System.Private.CoreLib.Generators\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Dev1\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "targetAlias": "netstandard2.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "targetAlias": "netstandard2.0",
+          "dependencies": {
+            "Microsoft.CodeAnalysis.CSharp": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "(, )"
+            },
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

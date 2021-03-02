@@ -1,0 +1,31 @@
+<Project>
+  <PropertyGroup>
+    <!-- Unset the repo tool manifest property in CI as we don't use repo tools there anyway,
+    until https://github.com/dotnet/sdk/issues/10938 is fixed. -->
+    <_RepoToolManifest Condition="'$(ContinuousIntegrationBuild)' == 'true'" />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.Build.Tasks.Packaging" Version="$(MicrosoftDotNetBuildTasksPackagingVersion)" />
+    <!-- enable source link in pkgproj -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkVersion)" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="$(MicrosoftSourceLinkVersion)" PrivateAssets="all" IsImplicitlyDefined="true" />
+  </ItemGroup>
+
+  <!-- excluded from source build -->
+  <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true'">
+    <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="$(MicrosoftDotNetBuildTasksFeedVersion)" />
+    <PackageReference Include="Microsoft.DotNet.VersionTools.Tasks" Version="$(MicrosoftDotNetVersionToolsTasksVersion)" />
+  </ItemGroup>
+
+  <!-- Mega hack to remove Newtonsoft.Json dependency which doesn't unify during runtime with the dependency in the SDK and causes MissingMethodExceptions. -->
+  <Target Name="RemovePackagingContentForMSBuildALC"
+          AfterTargets="Restore">
+    <PropertyGroup>
+      <_BuildTasksPackagingNewtonsoftDependency>$(NuGetPackageRoot)microsoft.dotnet.build.tasks.packaging\$(MicrosoftDotNetBuildTasksPackagingVersion)\tools\netcoreapp3.1\Newtonsoft.Json.dll</_BuildTasksPackagingNewtonsoftDependency>
+    </PropertyGroup>
+
+    <Delete Files="$(_BuildTasksPackagingNewtonsoftDependency)" Condition="Exists('$(_BuildTasksPackagingNewtonsoftDependency)')" />
+  </Target>
+
+</Project>
