@@ -34,9 +34,19 @@ void cgpu_destroy_instance(CGpuInstanceId instance)
     instance->proc_table->destroy_instance(instance);
 }
 
-CGpuAdapterId cgpu_request_adapter(CGpuInstanceId instance)
+void cgpu_enum_adapters(CGpuInstanceId instance, const CGpuAdapterId* adapters, size_t* adapters_num)
 {
+    assert(instance != CGPU_NULLPTR && "fatal: can't destroy NULL instance!");
 
-    
-    return CGPU_NULLPTR;
+    instance->proc_table->enum_adapters(instance, adapters, adapters_num);
+}
+
+void cgpu_drop_adapter(CGpuAdapterId adapter)
+{
+    adapter->instance->proc_table->drop_adapter(adapter);
+}
+
+CGpuAdapterId cgpu_get_default_adapter(CGpuInstanceId instance)
+{
+    instance->proc_table->get_default_adapter(instance);
 }
