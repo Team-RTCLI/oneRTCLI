@@ -11,7 +11,7 @@ CGpuInstanceId init_instance(ECGPUBackEnd backend)
 }
 
 auto webgpu_instance = init_instance(ECGPUBackEnd_WEBGPU);
-//auto vulkan_instance = init_instance(ECGPUBackEnd_VULKAN);
+auto vulkan_instance = init_instance(ECGPUBackEnd_VULKAN);
 
 int main()
 {

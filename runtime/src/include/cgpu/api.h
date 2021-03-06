@@ -63,9 +63,6 @@ typedef void (*CGPUProcDestroyInstance)(CGpuInstanceId instance);
 void cgpu_enum_adapters(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 typedef void (*CGPUProcEnumAdapters)(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 
-CGpuAdapterId cgpu_get_default_adapter(CGpuInstanceId instance);
-typedef CGpuAdapterId (*CGPUProcGetDefaultAdapter)(CGpuInstanceId instance);
-
 CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter);
 typedef CGpuAdapterDetail (*CGPUProcQueryAdapterDetail)(const CGpuAdapterId instance);
 
@@ -74,7 +71,6 @@ typedef struct CGpuProcTable
     CGPUProcCreateInstance create_instance;
     CGPUProcDestroyInstance destroy_instance;
     CGPUProcEnumAdapters enum_adapters;
-    CGPUProcGetDefaultAdapter get_default_adapter;
     CGPUProcQueryAdapterDetail query_adapter_detail;
 } CGpuProcTable;
 
