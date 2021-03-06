@@ -6,6 +6,28 @@
 #include <memory>
 #include "cgpu/backend/webgpu/bridge.h"
 
+// implementations
+CGpuInstanceId cgpu_create_instance_webgpu(CGpuInstanceDescriptor const* descriptor);
+void cgpu_destroy_instance_webgpu(CGpuInstanceId instance);
+void cgpu_enum_adapters_webgpu(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
+void cgpu_drop_adapter_webgpu(CGpuAdapterId adapter);
+CGpuAdapterId cgpu_get_default_adapter_webgpu(CGpuInstanceId adapter);
+CGpuAdapterDetail cgpu_query_adapter_detail_webgpu(const CGpuAdapterId adapter);
+
+const CGpuProcTable tbl = 
+{
+    .create_instance = &cgpu_create_instance_webgpu,
+    .destroy_instance = &cgpu_destroy_instance_webgpu,
+    .enum_adapters = &cgpu_enum_adapters_webgpu,
+    .get_default_adapter = &cgpu_get_default_adapter_webgpu,
+    .query_adapter_detail = &cgpu_query_adapter_detail_webgpu
+};
+
+const CGpuProcTable* CGPU_WebGPUProcTable(const WGPUBackendType t)
+{
+    return &tbl;
+}
+
 #ifdef __EMSCRIPTEN__
 
 #else 
