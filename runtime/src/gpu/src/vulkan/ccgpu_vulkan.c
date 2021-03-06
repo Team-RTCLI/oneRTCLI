@@ -21,7 +21,7 @@ const CGpuProcTable* CGPU_VulkanProcTable()
 CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descriptor)
 {
     CGpuInstance_Vulkan* result = malloc(sizeof(CGpuInstance_Vulkan));
-    VkApplicationInfo appInfo = {};
+    VkApplicationInfo appInfo = {0};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "CGPU";
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -33,7 +33,7 @@ CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descrip
 	// en: Create VkInstance.
 	// jp: VkInstanceを作る.
 	{
-		VkInstanceCreateInfo createInfo = {};
+		VkInstanceCreateInfo createInfo = {0};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createInfo.pApplicationInfo = &appInfo;
         const char* exts[] = {
@@ -44,7 +44,7 @@ CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descrip
 		createInfo.ppEnabledExtensionNames = exts;
 		//if (bEnableValidationLayers && !checkValidationLayerSupport(validationLayers))
 		//{
-	    //    assert("validation layers requested, but not available!");
+	    //    assert(0 && "validation layers requested, but not available!");
 		//}
 
 		//VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
@@ -65,7 +65,7 @@ CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descrip
 			createInfo.enabledLayerCount = 0;
 			createInfo.pNext = VK_NULL_HANDLE;
 		//}
-		if (vkCreateInstance(&createInfo, VK_NULL_HANDLE, &result->vk_instance) != VK_SUCCESS)
+		if (vkCreateInstance(&createInfo, VK_NULL_HANDLE, &result->mVkInstance) != VK_SUCCESS)
 		{
 			assert(0 && "Vulkan: failed to create instance!");
 		}
@@ -76,9 +76,15 @@ CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descrip
 void cgpu_destroy_instance_vulkan(CGpuInstanceId instance)
 {
     CGpuInstance_Vulkan* to_destroy = (CGpuInstance_Vulkan*)instance;
-    vkDestroyInstance(to_destroy->vk_instance, VK_NULL_HANDLE);
+    vkDestroyInstance(to_destroy->mVkInstance, VK_NULL_HANDLE);
     free(to_destroy);
 }
+
+
+// exts
+
+#include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
+
 
 
 #endif

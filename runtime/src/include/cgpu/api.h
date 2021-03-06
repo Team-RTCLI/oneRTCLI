@@ -28,8 +28,11 @@ typedef enum ECGPUBackEnd
     ECGPUBackEnd_COUNT
 } ECGPUBackEnd;
 
-typedef struct CGpuAdapterDetail
-{
+typedef struct CGpuInstanceDescriptor {
+    ECGPUBackEnd backend;
+} CGpuInstanceDescriptor;
+
+typedef struct CGpuAdapterDetail {
     uint32_t deviceId;
     uint32_t vendorId;
     const char* name;
@@ -37,8 +40,7 @@ typedef struct CGpuAdapterDetail
     ECGPUBackEnd backend;
 } CGpuAdapterDetail;
 
-typedef struct CGpuAdapter 
-{
+typedef struct CGpuAdapter {
     const struct CGpuInstance* instance;
 } CGpuAdapter;
 typedef CGpuAdapter* CGpuAdapterId;
@@ -47,15 +49,10 @@ typedef CGpuDevice* CGpuDeviceId;
 typedef struct CGpuBuffer {const char* label;} CGpuBuffer;
 typedef CGpuBuffer* CGpuBufferId;
 
-typedef struct CGpuInstanceDescriptor
-{
-    ECGPUBackEnd backend;
-} CGpuInstanceDescriptor;
-// CGpuInstance is defined in cgpu_instnace.h
 typedef struct CGpuInstance* CGpuInstanceId;
 
 CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc);
-typedef CGpuInstanceId (*CGPUProcCreateInstance)(CGpuInstanceDescriptor const* descriptor);
+typedef CGpuInstanceId (*CGPUProcCreateInstance)(const CGpuInstanceDescriptor * descriptor);
 
 void cgpu_destroy_instance(CGpuInstanceId instance);
 typedef void (*CGPUProcDestroyInstance)(CGpuInstanceId instance);
@@ -66,19 +63,16 @@ typedef void (*CGPUProcEnumAdapters)(CGpuInstanceId instance, CGpuAdapterId* con
 CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter);
 typedef CGpuAdapterDetail (*CGPUProcQueryAdapterDetail)(const CGpuAdapterId instance);
 
-typedef struct CGpuProcTable 
-{
+typedef struct CGpuProcTable {
     CGPUProcCreateInstance create_instance;
     CGPUProcDestroyInstance destroy_instance;
     CGPUProcEnumAdapters enum_adapters;
     CGPUProcQueryAdapterDetail query_adapter_detail;
 } CGpuProcTable;
 
-typedef struct CGpuInstance
-{
+typedef struct CGpuInstance {
     const CGpuProcTable* proc_table;
 } CGpuInstance;
-
 
 #ifdef __cplusplus
 } // end extern "C"

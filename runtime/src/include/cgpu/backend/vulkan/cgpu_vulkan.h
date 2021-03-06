@@ -13,12 +13,12 @@ void cgpu_destroy_instance_vulkan(CGpuInstanceId instance);
 
 typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;
-    VkInstance vk_instance;
+    VkInstance mVkInstance;
 } CGpuInstance_Vulkan;
 
 typedef struct CGpuAdapter_Vulkan {
     CGpuAdapter super;
-    VkPhysicalDevice physical_device;
+    VkPhysicalDevice mPhysicalDevice;
 } CGpuAdapter_Vulkan;
 
 

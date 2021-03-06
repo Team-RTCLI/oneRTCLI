@@ -32,9 +32,9 @@ public:
 #else
         WGPUBackendType type = WGPUBackendType_Vulkan;
 #endif
-        dawn_instance = std::make_unique<dawn_native::Instance>();
-        dawn_instance->DiscoverDefaultAdapters();
-        auto dawn_native_adapters = dawn_instance->GetAdapters();
+        mDawnInstance = std::make_unique<dawn_native::Instance>();
+        mDawnInstance->DiscoverDefaultAdapters();
+        auto dawn_native_adapters = mDawnInstance->GetAdapters();
         dawn_adapters.resize(dawn_native_adapters.size());
         for(auto i = 0u; i < dawn_adapters.size(); i++)
         {
@@ -47,7 +47,7 @@ public:
     }
 
     std::vector<GpuAdapterDawn> dawn_adapters;
-    std::unique_ptr<dawn_native::Instance> dawn_instance;
+    std::unique_ptr<dawn_native::Instance> mDawnInstance;
 };
 
 CGpuInstanceId cgpu_create_instance_webgpu(CGpuInstanceDescriptor const* descriptor)

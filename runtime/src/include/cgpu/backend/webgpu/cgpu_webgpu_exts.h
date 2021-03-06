@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 // api extentions.
+CGpuInstanceId cgpu_webgpu_create_instance(CGpuInstanceDescriptor const* descriptor);
 WGPUBackendType cgpu_webgpu_query_backend(CGpuAdapterId adapter);
 
 #ifdef __cplusplus
