@@ -1,6 +1,7 @@
 #include "cgpu/api.h"
 #ifdef CGPU_USE_WEBGPU
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
+#include "cgpu/backend/webgpu/cgpu_exts.h"
 #endif
 
 #ifdef __APPLE__
@@ -34,19 +35,19 @@ void cgpu_destroy_instance(CGpuInstanceId instance)
     instance->proc_table->destroy_instance(instance);
 }
 
-void cgpu_enum_adapters(CGpuInstanceId instance, const CGpuAdapterId* adapters, size_t* adapters_num)
+void cgpu_enum_adapters(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num)
 {
     assert(instance != CGPU_NULLPTR && "fatal: can't destroy NULL instance!");
 
     instance->proc_table->enum_adapters(instance, adapters, adapters_num);
 }
 
-void cgpu_drop_adapter(CGpuAdapterId adapter)
-{
-    adapter->instance->proc_table->drop_adapter(adapter);
-}
-
 CGpuAdapterId cgpu_get_default_adapter(CGpuInstanceId instance)
 {
-    instance->proc_table->get_default_adapter(instance);
+    return instance->proc_table->get_default_adapter(instance);
+}
+
+CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter)
+{
+    return adapter->instance->proc_table->query_adapter_detail(adapter);
 }

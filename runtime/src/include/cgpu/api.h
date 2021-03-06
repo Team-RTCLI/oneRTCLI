@@ -11,17 +11,7 @@ extern "C" {
 #define CGPU_NULLPTR NULL
 #endif
 #endif
-
-typedef struct CGpuAdapter 
-{
-    const char* label;
-    const struct CGpuInstance* instance;
-} CGpuAdapter;
-typedef CGpuAdapter* CGpuAdapterId;
-typedef struct CGpuDevice {const char* label;} CGpuDevice;
-typedef CGpuDevice* CGpuDeviceId;
-typedef struct CGpuBuffer {const char* label;} CGpuBuffer;
-typedef CGpuBuffer* CGpuBufferId;
+#include <stdint.h>
 
 typedef int CGpuVersion;
 typedef enum ECGPUBackEnd
@@ -38,6 +28,25 @@ typedef enum ECGPUBackEnd
     ECGPUBackEnd_COUNT
 } ECGPUBackEnd;
 
+typedef struct CGpuAdapterDetail
+{
+    uint32_t deviceId;
+    uint32_t vendorId;
+    const char* name;
+    const char* driverDescription;
+    ECGPUBackEnd backend;
+} CGpuAdapterDetail;
+
+typedef struct CGpuAdapter 
+{
+    const struct CGpuInstance* instance;
+} CGpuAdapter;
+typedef CGpuAdapter* CGpuAdapterId;
+typedef struct CGpuDevice {const char* label;} CGpuDevice;
+typedef CGpuDevice* CGpuDeviceId;
+typedef struct CGpuBuffer {const char* label;} CGpuBuffer;
+typedef CGpuBuffer* CGpuBufferId;
+
 typedef struct CGpuInstanceDescriptor
 {
     ECGPUBackEnd backend;
@@ -46,10 +55,34 @@ typedef struct CGpuInstanceDescriptor
 typedef struct CGpuInstance* CGpuInstanceId;
 
 CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc);
+typedef CGpuInstanceId (*CGPUProcCreateInstance)(CGpuInstanceDescriptor const* descriptor);
+
 void cgpu_destroy_instance(CGpuInstanceId instance);
-void cgpu_enum_adapters(CGpuInstanceId instance, const CGpuAdapterId* adapters, size_t* adapters_num);
-void cgpu_drop_adapter(CGpuAdapterId adapter);
+typedef void (*CGPUProcDestroyInstance)(CGpuInstanceId instance);
+
+void cgpu_enum_adapters(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
+typedef void (*CGPUProcEnumAdapters)(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
+
 CGpuAdapterId cgpu_get_default_adapter(CGpuInstanceId instance);
+typedef CGpuAdapterId (*CGPUProcGetDefaultAdapter)(CGpuInstanceId instance);
+
+CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter);
+typedef CGpuAdapterDetail (*CGPUProcQueryAdapterDetail)(const CGpuAdapterId instance);
+
+typedef struct CGpuProcTable 
+{
+    CGPUProcCreateInstance create_instance;
+    CGPUProcDestroyInstance destroy_instance;
+    CGPUProcEnumAdapters enum_adapters;
+    CGPUProcGetDefaultAdapter get_default_adapter;
+    CGPUProcQueryAdapterDetail query_adapter_detail;
+} CGpuProcTable;
+
+typedef struct CGpuInstance
+{
+    const CGpuProcTable* proc_table;
+} CGpuInstance;
+
 
 #ifdef __cplusplus
 } // end extern "C"

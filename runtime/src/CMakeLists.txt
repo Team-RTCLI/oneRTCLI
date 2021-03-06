@@ -2,8 +2,10 @@ cmake_minimum_required (VERSION 3.3)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-include(cmake/platform.cmake)
 project(RTCLI)
+
+include(cmake/platform.cmake)
+include(cmake/vulkan.cmake)
 
 # Build Options.
 option(RTCLI_VM_LIB "Build VM as Static Library." ON)

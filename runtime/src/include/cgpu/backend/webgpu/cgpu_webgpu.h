@@ -1,7 +1,7 @@
 #include "cgpu/api.h"
-#include "cgpu/cgpu_instance.h"
 
-#ifdef CGPU_USE_WEBGPU
+#ifdef __EMSCRIPTEN__
+#else
 #include "dawn/webgpu.h"
 #endif
 
@@ -9,14 +9,16 @@
 extern "C" {
 #endif
 
-const CGpuProcTable* CGPU_WebGPUProcTable(const WGPUBackendType t);
+const CGpuProcTable* CGPU_WebGPUProcTable(const enum WGPUBackendType t);
 
 // implementations
 CGpuInstanceId cgpu_create_instance_webgpu(CGpuInstanceDescriptor const* descriptor);
 void cgpu_destroy_instance_webgpu(CGpuInstanceId instance);
-void cgpu_enum_adapters_webgpu(CGpuInstanceId instance, const CGpuAdapterId* adapters, size_t* adapters_num);
+void cgpu_enum_adapters_webgpu(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 void cgpu_drop_adapter_webgpu(CGpuAdapterId adapter);
 CGpuAdapterId cgpu_get_default_adapter_webgpu(CGpuInstanceId adapter);
+CGpuAdapterDetail cgpu_query_adapter_detail_webgpu(const CGpuAdapterId adapter);
+
 
 typedef struct CGpuInstance_WebGpu {
     CGpuInstance super;
@@ -25,7 +27,6 @@ typedef struct CGpuInstance_WebGpu {
 
 typedef struct CGpuAdapter_WebGpu {
     CGpuAdapter super;
-    WGPUBackendType backend;
 } CGpuAdapter_WebGpu;
 
 #ifdef __cplusplus
