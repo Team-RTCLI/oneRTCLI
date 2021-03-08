@@ -1,5 +1,10 @@
+#pragma once
 #include "cgpu/api.h"
 #include "stdbool.h"
+#ifdef _WIN32
+#include "windows.h"
+#include "vulkan/vulkan_win32.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +23,7 @@ typedef struct CGpuVulkanInstanceDescriptor {
 } CGpuVulkanInstanceDescriptor;
 
 // api extentions.
-CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* descriptor);
+CGpuInstanceId cgpu_vulkan_create_instance(CGpuVulkanInstanceDescriptor const* descriptor);
 
 #ifdef __cplusplus
 } // end extern "C"

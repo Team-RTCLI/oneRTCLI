@@ -10,6 +10,8 @@ const CGpuProcTable* CGPU_VulkanProcTable();
 
 CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descriptor);
 void cgpu_destroy_instance_vulkan(CGpuInstanceId instance);
+void cgpu_enum_adapters_vulkan(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
+CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter);
 
 typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;

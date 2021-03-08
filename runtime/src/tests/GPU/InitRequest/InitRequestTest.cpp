@@ -2,6 +2,10 @@
 #include "cgpu/api.h"
 #include <iostream>
 #include <vector>
+#ifdef CGPU_USE_VULKAN
+#include "vulkan/vulkan_core.h"
+#include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
+#endif
 
 CGpuInstanceId init_instance(ECGPUBackEnd backend)
 {
@@ -28,6 +32,7 @@ int enum_adapters(CGpuInstanceId instance)
     //cgpu_destroy_instance(instance);
     return adapters_count;
 }
+
 class CGpuTest : public ::testing::Test
 {
 protected:
@@ -55,7 +60,25 @@ TEST(CGpuTest, EnumAdapters)
     EXPECT_TRUE( vulkan_instance != nullptr );
 
     auto webgpu_adapters = enum_adapters(webgpu_instance);
-    auto vulkan_adapters = enum_adapters(webgpu_instance);
+    auto vulkan_adapters = enum_adapters(vulkan_instance);
     EXPECT_TRUE( webgpu_adapters > 0 );
     EXPECT_TRUE( vulkan_adapters > 0 );
 }
+ 
+#ifdef CGPU_USE_VULKAN
+TEST(CGpuTest, CreateVkInstance)
+{
+    CGpuVulkanInstanceDescriptor vkDesc = {};
+    const char* exts[] = 
+    {
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+		VK_KHR_SURFACE_EXTENSION_NAME
+    };
+    vkDesc.mInstanceExtensionCount = 2;
+    vkDesc.ppInstanceExtensions = exts;
+    vkDesc.mRequestAllAvailableQueues = true;
+    
+    //auto vulkan_instance = cgpu_vulkan_create_instance(&vkDesc);
+    //EXPECT_TRUE( vulkan_instance != nullptr );
+}
+#endif
