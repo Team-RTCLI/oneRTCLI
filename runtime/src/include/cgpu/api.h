@@ -51,14 +51,36 @@ typedef struct CGpuAdapterDetail {
     const char* name;
 } CGpuAdapterDetail;
 
+typedef uint32_t CGpuQueueIndex;
+typedef enum ECGpuQueueType{
+    ECGpuQueueType_Graphics = 0,
+    ECGpuQueueType_Compute = 1,
+    ECGpuQueueType_Transfer = 2,
+    ECGpuQueueType_Count
+} ECGpuQueueType;
+
+typedef struct CGpuQueueGroupDescriptor {
+    ECGpuQueueType type;
+    CGpuQueueIndex index;
+} CGpuQueueGroupDescriptor;
+
+typedef struct CGpuDeviceDescriptor {
+    CGpuQueueGroupDescriptor* queueGroups;
+    uint32_t                  queueGroupCount;
+} CGpuDeviceDescriptor;
+
 typedef struct CGpuAdapter {
     const struct CGpuInstance* instance;
 } CGpuAdapter;
 typedef CGpuAdapter* CGpuAdapterId;
+
+typedef struct CGpuQueue {ECGpuQueueType type; CGpuQueueIndex index;} CGpuQueue;
+typedef CGpuQueue* CGpuQueueId;
+
 typedef struct CGpuDevice {const char* label;} CGpuDevice;
 typedef CGpuDevice* CGpuDeviceId;
-typedef struct CGpuBuffer {const char* label;} CGpuBuffer;
-typedef CGpuBuffer* CGpuBufferId;
+
+
 
 typedef struct CGpuInstance* CGpuInstanceId;
 
@@ -74,11 +96,28 @@ typedef void (*CGPUProcEnumAdapters)(CGpuInstanceId instance, CGpuAdapterId* con
 CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter);
 typedef CGpuAdapterDetail (*CGPUProcQueryAdapterDetail)(const CGpuAdapterId instance);
 
+uint32_t cgpu_query_queue_count(const ECGpuQueueType type);
+typedef uint32_t (*CGPUProcQueryQueueCount)(const ECGpuQueueType type);
+
+CGpuDeviceId cgpu_create_device(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
+typedef CGpuDeviceId (*CGPUProcCreateDevice)(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
+
+void cgpu_destroy_device(CGpuDeviceId device);
+typedef void (*CGPUProcDestroyDevice)(CGpuDeviceId device);
+
+
+typedef struct CGpuBuffer {const char* label;} CGpuBuffer;
+typedef CGpuBuffer* CGpuBufferId;
+
+
 typedef struct CGpuProcTable {
-    CGPUProcCreateInstance create_instance;
-    CGPUProcDestroyInstance destroy_instance;
-    CGPUProcEnumAdapters enum_adapters;
+    CGPUProcCreateInstance     create_instance;
+    CGPUProcDestroyInstance    destroy_instance;
+    CGPUProcEnumAdapters       enum_adapters;
     CGPUProcQueryAdapterDetail query_adapter_detail;
+    CGPUProcQueryQueueCount    query_queue_count;
+    CGPUProcCreateDevice       create_device;
+    CGPUProcDestroyDevice      destroy_device;
 } CGpuProcTable;
 
 typedef struct CGpuInstance {
