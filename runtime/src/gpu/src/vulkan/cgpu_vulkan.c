@@ -42,11 +42,9 @@ CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter)
 {
     CGpuAdapter_Vulkan* a = (CGpuAdapter_Vulkan*)adapter;
     CGpuAdapterDetail d = {};
-	d.backend = ECGPUBackEnd_VULKAN;
 	d.deviceId = a->mPhysicalDeviceProps.deviceID;
 	d.vendorId = a->mPhysicalDeviceProps.vendorID;
 	d.name = a->mPhysicalDeviceProps.deviceName;
-	d.driverDescription = "Vulkan";
     return d;
 }
 

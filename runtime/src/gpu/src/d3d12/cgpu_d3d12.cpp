@@ -10,6 +10,7 @@
 #error "D3D12 requires C++! Sorry!"
 #endif
 #include <stdio.h>
+#include <vector>
 
 #if !defined(XBOX)
 #pragma comment(lib, "d3d12.lib")
@@ -56,15 +57,17 @@ void optionalEnableDebugLayer(CGpuInstance_D3D12* result, CGpuInstanceDescriptor
     }
 }
 
+#include <comdef.h>
+
 // Call this only once.
-uint32_t getProperGpuCount(IDXGIFactory6* pDXGIFactory)
+void getProperGpuCount(CGpuInstance_D3D12* instance, uint32_t* count, bool* foundSoftwareAdapter)
 {
-    uint32_t gpuCount = 0;
     IDXGIAdapter4* adapter = NULL;
-    bool foundSoftwareAdapter = false;
+    std::vector<IDXGIAdapter4*> adapters;
+    std::vector<D3D_FEATURE_LEVEL> adapter_levels;
     // Find number of usable GPUs
     // Use DXGI6 interface which lets us specify gpu preference so we dont need to use NVOptimus or AMDPowerExpress exports
-    for (UINT i = 0; DXGI_ERROR_NOT_FOUND != pDXGIFactory->EnumAdapterByGpuPreference(i,
+    for (UINT i = 0; DXGI_ERROR_NOT_FOUND != instance->pDXGIFactory->EnumAdapterByGpuPreference(i,
         DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
         IID_PPV_ARGS(&adapter)); ++i)
     {
@@ -84,18 +87,39 @@ uint32_t getProperGpuCount(IDXGIFactory6* pDXGIFactory)
                     if (SUCCEEDED(hres))
                     {
                         SAFE_RELEASE(cgpuAdapter.pDxActiveGPU);
-                        ++gpuCount;
+                        instance->mAdaptersCount++;
+                        // Add ref
+                        {
+                            adapters.push_back(adapter);
+                            adapter_levels.push_back(feature_levels[level]);
+                        }
                         break;
                     }
                 }
             }
         } else
         {
-            foundSoftwareAdapter = true;
+            *foundSoftwareAdapter = true;
         }
-        adapter->Release();
     }
-    return gpuCount;
+    *count = instance->mAdaptersCount;
+    instance->pAdapters = (CGpuAdapter_D3D12*)malloc(sizeof(CGpuAdapter_D3D12) * instance->mAdaptersCount);
+    for(uint32_t i = 0; i < *count; i++)
+    {
+        instance->pAdapters[i].pDxActiveGPU = adapters[i];
+        instance->pAdapters[i].mFeatureLevel = adapter_levels[i];
+        DXGI_ADAPTER_DESC3 desc = {};
+        adapters[i]->GetDesc3(&desc);
+
+        instance->pAdapters[i].mDeviceId = desc.DeviceId;
+        instance->pAdapters[i].mVendorId = desc.VendorId;
+        _bstr_t b(desc.Description);
+        char* str = b;
+        memcpy(instance->pAdapters[i].mDescription, str, b.length());
+        instance->pAdapters[i].mDescription[b.length()] = '\0';
+
+        instance->pAdapters[i].super.instance = &instance->super;
+    }
 } 
 
 CGpuInstanceId cgpu_create_instance_d3d12(CGpuInstanceDescriptor const* descriptor)
@@ -110,13 +134,19 @@ CGpuInstanceId cgpu_create_instance_d3d12(CGpuInstanceDescriptor const* descript
 #else 
     if(SUCCEEDED(CreateDXGIFactory2(flags, IID_PPV_ARGS(&result->pDXGIFactory))))
     {
-        uint32_t gpuCount = getProperGpuCount(result->pDXGIFactory);
-        printf("GPU Count %i\n", gpuCount);
+        uint32_t gpuCount = 0;
+        bool foundSoftwareAdapter = false;
+        getProperGpuCount(result, &gpuCount, &foundSoftwareAdapter);
+        // If the only adapter we found is a software adapter, log error message for QA
+        if (!gpuCount && foundSoftwareAdapter)
+        {
+            assert(0 && "The only available GPU has DXGI_ADAPTER_FLAG_SOFTWARE. Early exiting");
+            return CGPU_NULLPTR;
+        }
     } else {
         assert("[D3D12 Fatal]: Create DXGIFactory2 Failed!");
     }
 #endif
-
     return &result->super;
 }
 
@@ -130,12 +160,24 @@ void cgpu_destroy_instance_d3d12(CGpuInstanceId instance)
 
 void cgpu_enum_adapters_d3d12(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num)
 {
-
+    assert(instance != nullptr && "fatal: null instance!");
+    CGpuInstance_D3D12* I = (CGpuInstance_D3D12*)instance;
+    *adapters_num = I->mAdaptersCount;
+    if(!adapters) {
+        return;
+    } else {
+        for(auto i = 0u; i < *adapters_num; i++)
+            adapters[i] = &(I->pAdapters[i].super);
+    }
 }
 
 CGpuAdapterDetail cgpu_query_adapter_detail_d3d12(const CGpuAdapterId adapter)
 {
+    const CGpuAdapter_D3D12* A = (CGpuAdapter_D3D12*)adapter;
     CGpuAdapterDetail d = {};
+    d.deviceId = A->mDeviceId;
+    d.vendorId = A->mVendorId;
+    d.name = A->mDescription;
     return d;
 }
 

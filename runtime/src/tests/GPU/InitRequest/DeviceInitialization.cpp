@@ -23,7 +23,6 @@ int enum_adapters(CGpuInstanceId instance)
         auto prop = cgpu_query_adapter_detail(adapter);
         std::cout << "device id: " << prop.deviceId << "  vendor id: " << prop.vendorId << "\n";
         std::cout << "    name: " << prop.name << "\n";
-        std::cout << "    description: " << prop.driverDescription << "\n";
     }
     //cgpu_destroy_instance(instance);
     return adapters_count;
@@ -33,7 +32,9 @@ class CGpuTest : public::testing::TestWithParam<ECGPUBackEnd>
 {
 protected:
 	void SetUp() override
-	{}
+	{
+
+    }
 	CGpuInstanceId instance;
 };
 
@@ -53,9 +54,9 @@ TEST_P(CGpuTest, InstanceCreation)
 
 TEST_P(CGpuTest, AdapterEnum)
 {
-    //ECGPUBackEnd backend = GetParam();
-    //instance = init_instance(backend, true, true);
-    //EXPECT_GT(enum_adapters(instance), 0);
+    ECGPUBackEnd backend = GetParam();
+    instance = init_instance(backend, true, true);
+    EXPECT_GT(enum_adapters(instance), 0);
 }
 
 static const auto allPlatforms = testing::Values(

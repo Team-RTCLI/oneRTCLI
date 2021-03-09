@@ -23,6 +23,9 @@ typedef struct CGpuInstance_D3D12 {
     IDXGIFactory6*                  pDXGIFactory;
 #endif
     ID3D12Debug*                    pDXDebug;
+
+    struct CGpuAdapter_D3D12*       pAdapters;
+    uint32_t                        mAdaptersCount;
 #if defined(__cplusplus)
 
 #endif
@@ -36,6 +39,10 @@ typedef struct CGpuAdapter_D3D12 {
 #elif defined(_WIN32)
 	IDXGIAdapter4*                  pDxActiveGPU;
 #endif
+    D3D_FEATURE_LEVEL               mFeatureLevel;
+    uint32_t                        mDeviceId;
+    uint32_t                        mVendorId;
+    char                            mDescription[128];
 } CGpuAdapter_D3D12;
 
 

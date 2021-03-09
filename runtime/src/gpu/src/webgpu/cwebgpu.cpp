@@ -81,9 +81,7 @@ CGpuAdapterDetail cgpu_query_adapter_detail_webgpu(const CGpuAdapterId adapter)
     CGpuAdapterDetail d = {};
     d.deviceId = a->properties.deviceID;
     d.vendorId = a->properties.vendorID;
-    d.driverDescription = a->properties.driverDescription;
     d.name = a->properties.name;
-    d.backend = ECGPUBackEnd_WEBGPU;
     return d;
 }
 

@@ -49,8 +49,6 @@ typedef struct CGpuAdapterDetail {
     uint32_t deviceId;
     uint32_t vendorId;
     const char* name;
-    const char* driverDescription;
-    ECGPUBackEnd backend;
 } CGpuAdapterDetail;
 
 typedef struct CGpuAdapter {
