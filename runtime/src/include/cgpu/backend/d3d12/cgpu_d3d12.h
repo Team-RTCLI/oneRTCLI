@@ -23,9 +23,8 @@ typedef struct CGpuInstance_D3D12 {
     IDXGIFactory6*                  pDXGIFactory;
 #endif
     ID3D12Debug*                    pDXDebug;
-
 #if defined(__cplusplus)
-    
+
 #endif
 
 } CGpuInstance_D3D12;

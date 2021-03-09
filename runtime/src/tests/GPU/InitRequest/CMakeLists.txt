@@ -3,6 +3,7 @@ enable_testing()
 add_executable(CGPUDeviceTest 
    DeviceInitialization.cpp 
    VkDeviceExts.cpp 
+   D3DDeviceExts.cpp
 )
 
 target_link_libraries(CGPUDeviceTest 
