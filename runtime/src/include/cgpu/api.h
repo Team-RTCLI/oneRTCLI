@@ -1,5 +1,7 @@
 #pragma once
 #include "cgpu_config.h"
+#include "stdbool.h"
+#define CGPU_ARRAY_LEN(array,len) {len = (sizeof(array) / sizeof(array[0]));}
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,19 +19,30 @@ typedef int CGpuVersion;
 typedef enum ECGPUBackEnd
 {
 #ifdef CGPU_USE_WEBGPU
-    ECGPUBackEnd_WEBGPU,
+    ECGPUBackEnd_WEBGPU = 0,
 #endif
 #ifdef CGPU_USE_VULKAN
-    ECGPUBackEnd_VULKAN,
+    ECGPUBackEnd_VULKAN = 1,
 #endif
 #ifdef CGPU_USE_D3D12
-    ECGPUBackEnd_D3D12,
+    ECGPUBackEnd_D3D12 = 2,
+#ifdef XBOX
+    ECGPUBackEnd_XBOX_D3D12 = 3,
+#endif
+#endif
+#ifdef CGPU_USE_AGC
+    ECGPUBackEnd_AGC = 4,
+#endif
+#ifdef CGPU_USE_METAL
+    ECGPUBackEnd_METAL = 5,
 #endif
     ECGPUBackEnd_COUNT
 } ECGPUBackEnd;
 
 typedef struct CGpuInstanceDescriptor {
     ECGPUBackEnd backend;
+    bool         enableDebugLayer;
+    bool         enableGpuBasedValidation;
 } CGpuInstanceDescriptor;
 
 typedef struct CGpuAdapterDetail {

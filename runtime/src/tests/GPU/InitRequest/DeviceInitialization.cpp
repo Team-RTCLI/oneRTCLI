@@ -1,10 +1,12 @@
 #include "gtest/gtest.h"
 #include "cgpu/api.h"
 
-CGpuInstanceId init_instance(ECGPUBackEnd backend)
+CGpuInstanceId init_instance(ECGPUBackEnd backend, bool enableDebugLayer, bool enableGPUValidation)
 {
     CGpuInstanceDescriptor desc;
     desc.backend = backend;
+    desc.enableDebugLayer = enableDebugLayer;
+    desc.enableGpuBasedValidation = enableGPUValidation;
     CGpuInstanceId instance = cgpu_create_instance(&desc);
     return instance;
 }
@@ -38,13 +40,30 @@ protected:
 TEST_P(CGpuTest, InstanceCreation)
 {
     ECGPUBackEnd backend =  GetParam();
-    EXPECT_TRUE(init_instance(backend) != CGPU_NULLPTR);
+    auto inst = init_instance(backend, true, true);
+    auto inst2 = init_instance(backend, true, false);
+    auto inst3 = init_instance(backend, false, false);
+    EXPECT_NE(inst, CGPU_NULLPTR);
+    EXPECT_NE(inst2, CGPU_NULLPTR);
+    EXPECT_NE(inst3, CGPU_NULLPTR);
 }
+
 TEST_P(CGpuTest, AdapterEnum)
 {
     ECGPUBackEnd backend = GetParam();
-    instance = init_instance(backend);
-    EXPECT_TRUE(enum_adapters(instance) > 0);
+    instance = init_instance(backend, true, true);
+    EXPECT_GT(enum_adapters(instance), 0);
 }
-INSTANTIATE_TEST_SUITE_P(InstanceCreation, CGpuTest, testing::Values(ECGPUBackEnd_WEBGPU, ECGPUBackEnd_VULKAN));
-INSTANTIATE_TEST_SUITE_P(AdapterEnum, CGpuTest, testing::Values(ECGPUBackEnd_WEBGPU, ECGPUBackEnd_VULKAN));
+
+static const auto allPlatforms = testing::Values(
+#ifdef CGPU_USE_WEBGPU
+    ECGPUBackEnd_WEBGPU
+#endif
+#ifdef CGPU_USE_VULKAN
+    , ECGPUBackEnd_VULKAN
+#endif
+#ifdef CGPU_USE_D3D12
+    //,ECGPUBackEnd_D3D12
+#endif
+);
+INSTANTIATE_TEST_SUITE_P(DeviceInitialization, CGpuTest, allPlatforms);

@@ -1,12 +1,9 @@
 #pragma once
 #include "cgpu/api.h"
-#include "stdbool.h"
-#include "vulkan/vulkan_core.h"
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#include "vulkan/vulkan_win32.h"
+#define VK_USE_PLATFORM_WIN32_KHR
 #endif
+#include "volk.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +23,7 @@ typedef struct CGpuVulkanInstanceDescriptor {
 } CGpuVulkanInstanceDescriptor;
 
 // api extentions.
-CGpuInstanceId cgpu_vulkan_create_instance(CGpuVulkanInstanceDescriptor const* descriptor);
+CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, CGpuVulkanInstanceDescriptor const* exts);
 
 #ifdef __cplusplus
 } // end extern "C"

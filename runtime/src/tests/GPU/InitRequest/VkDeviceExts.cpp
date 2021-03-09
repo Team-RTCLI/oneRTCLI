@@ -3,7 +3,6 @@
 #include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
 #include "gtest/gtest.h"
 #include <vector>
-#include "vulkan/vulkan_core.h"
 
 class VkDeviceExtsTest : public testing::Test 
 {
@@ -32,7 +31,6 @@ TEST_F(VkDeviceExtsTest, CreateVkInstance)
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
 		VK_KHR_SURFACE_EXTENSION_NAME
     };
-
     vkDesc.mInstanceExtensionCount = 2;
     vkDesc.ppInstanceExtensions = exts;
     // Messenger Enable.
@@ -45,7 +43,12 @@ TEST_F(VkDeviceExtsTest, CreateVkInstance)
     // request all available queues.
     vkDesc.mRequestAllAvailableQueues = true;
 
-    auto vulkan_instance = cgpu_vulkan_create_instance(&vkDesc);
+    CGpuInstanceDescriptor desc;
+    desc.backend = ECGPUBackEnd_VULKAN;
+    desc.enableGpuBasedValidation = true;
+    desc.enableDebugLayer = true;
+
+    auto vulkan_instance = cgpu_vulkan_create_instance(&desc, &vkDesc);
     EXPECT_TRUE( vulkan_instance != nullptr );
 }
 

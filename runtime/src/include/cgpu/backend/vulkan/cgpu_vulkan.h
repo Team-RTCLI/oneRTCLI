@@ -1,6 +1,6 @@
 #pragma once
 #include "cgpu/api.h"
-#include "vulkan/vulkan_core.h"
+#include "volk.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,6 +17,7 @@ typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;
     VkInstance mVkInstance;
     struct CGpuAdapter_Vulkan* pVulkanAdapters;
+    VkDebugUtilsMessengerEXT pVkDebugUtilsMessenger;
     uint32_t mPhysicalDeviceCount;
 } CGpuInstance_Vulkan;
 
