@@ -16,11 +16,15 @@ CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter);
 typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;
     VkInstance mVkInstance;
+    struct CGpuAdapter_Vulkan* pVulkanAdapters;
+    uint32_t mPhysicalDeviceCount;
 } CGpuInstance_Vulkan;
 
 typedef struct CGpuAdapter_Vulkan {
     CGpuAdapter super;
     VkPhysicalDevice mPhysicalDevice;
+    VkPhysicalDeviceProperties mPhysicalDeviceProps;
+    VkPhysicalDeviceFeatures mPhysicalDeviceFeatures;
 } CGpuAdapter_Vulkan;
 
 

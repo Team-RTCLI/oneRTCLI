@@ -45,7 +45,6 @@ public:
         }
         backend = type;
     }
-
     std::vector<GpuAdapterDawn> dawn_adapters;
     std::unique_ptr<dawn_native::Instance> mDawnInstance;
 };

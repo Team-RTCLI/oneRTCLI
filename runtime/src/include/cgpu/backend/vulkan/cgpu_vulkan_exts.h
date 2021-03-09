@@ -1,6 +1,7 @@
 #pragma once
 #include "cgpu/api.h"
 #include "stdbool.h"
+#include "vulkan/vulkan_core.h"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
@@ -21,6 +22,7 @@ typedef struct CGpuVulkanInstanceDescriptor {
 	/// Flag to specify whether to request all queues from the gpu or just one of each type
 	/// This will affect memory usage - Around 200 MB more used if all queues are requested
 	bool                         mRequestAllAvailableQueues;
+	const VkDebugUtilsMessengerCreateInfoEXT* pDebugUtilsMessenger;
 } CGpuVulkanInstanceDescriptor;
 
 // api extentions.

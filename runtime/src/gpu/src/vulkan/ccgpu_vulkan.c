@@ -1,6 +1,7 @@
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
 #include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
 #include <assert.h>
+#include <stdlib.h>
 
 #ifdef CGPU_USE_VULKAN
 
@@ -8,7 +9,8 @@ const CGpuProcTable tbl_vk =
 {
     .create_instance = &cgpu_create_instance_vulkan,
     .destroy_instance = &cgpu_destroy_instance_vulkan,
-	.enum_adapters = &cgpu_enum_adapters_vulkan
+	.enum_adapters = &cgpu_enum_adapters_vulkan,
+	.query_adapter_detail = &cgpu_query_adapter_detail_vulkan
 };
 
 const CGpuProcTable* CGPU_VulkanProcTable()
@@ -23,42 +25,41 @@ CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descrip
 
 void cgpu_enum_adapters_vulkan(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num)
 {
-
+	CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)instance;
+	if (adapters == CGPU_NULLPTR)
+	{
+		*adapters_num = I->mPhysicalDeviceCount;
+		return;
+	} else {
+		for(uint32_t i = 0; i < I->mPhysicalDeviceCount; i++)
+		{
+			adapters[i] = &I->pVulkanAdapters[i].super;
+		}
+	}
 }
 
 void cgpu_destroy_instance_vulkan(CGpuInstanceId instance)
 {
     CGpuInstance_Vulkan* to_destroy = (CGpuInstance_Vulkan*)instance;
     vkDestroyInstance(to_destroy->mVkInstance, VK_NULL_HANDLE);
-    free(to_destroy);
+	free(to_destroy->pVulkanAdapters);
+	free(to_destroy);
 }
 
+CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter)
+{
+    CGpuAdapter_Vulkan* a = (CGpuAdapter_Vulkan*)adapter;
+    CGpuAdapterDetail d = {};
+	d.backend = ECGPUBackEnd_VULKAN;
+	d.deviceId = a->mPhysicalDeviceProps.deviceID;
+	d.vendorId = a->mPhysicalDeviceProps.vendorID;
+	d.name = a->mPhysicalDeviceProps.deviceName;
+	d.driverDescription = "Vulkan";
+    return d;
+}
 
 // exts
 #include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
-
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    void* pUserData) 
-{
-	switch(messageSeverity)
-	{
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-			printf("[verbose]");break; 
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: 
-			printf("[info]");break;
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-			printf("[warning]"); break;
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT :
-			printf("[error]"); break;
-		default:
-			return VK_TRUE;
-	}
-	printf(" validation layer: %s\n", pCallbackData->pMessage); 
-    return VK_FALSE;
-}
 
 CGpuInstanceId cgpu_vulkan_create_instance(CGpuVulkanInstanceDescriptor const* descriptor)
 {
@@ -95,20 +96,33 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuVulkanInstanceDescriptor const* d
 	{
 		createInfo.enabledLayerCount = descriptor->mInstanceLayerCount;
 		createInfo.ppEnabledLayerNames = descriptor->ppInstanceLayers;
-
-		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {0};
-		debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-		debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-		debugCreateInfo.pfnUserCallback = debugCallback;
-		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+		createInfo.pNext = descriptor->pDebugUtilsMessenger;
 	} else {
 		createInfo.enabledLayerCount = 0;
 		createInfo.pNext = VK_NULL_HANDLE;
 	}
+	
 	if (vkCreateInstance(&createInfo, VK_NULL_HANDLE, &result->mVkInstance) != VK_SUCCESS)
 	{
 		assert(0 && "Vulkan: failed to create instance!");
+	}
+	
+	vkEnumeratePhysicalDevices(result->mVkInstance, &result->mPhysicalDeviceCount, CGPU_NULLPTR);
+	if(result->mPhysicalDeviceCount != 0)
+	{
+		result->pVulkanAdapters = malloc(sizeof(CGpuAdapter_Vulkan) * result->mPhysicalDeviceCount);
+		VkPhysicalDevice* pysicalDevices = malloc(sizeof(VkPhysicalDevice) * result->mPhysicalDeviceCount);
+		vkEnumeratePhysicalDevices(result->mVkInstance, &result->mPhysicalDeviceCount, pysicalDevices);
+		for(uint32_t i = 0; i < result->mPhysicalDeviceCount; i++)
+		{
+			result->pVulkanAdapters[i].super.instance = &result->super;
+			result->pVulkanAdapters[i].mPhysicalDevice = pysicalDevices[i];
+			vkGetPhysicalDeviceProperties(pysicalDevices[i], &result->pVulkanAdapters[i].mPhysicalDeviceProps);
+			vkGetPhysicalDeviceFeatures(pysicalDevices[i], &result->pVulkanAdapters[i].mPhysicalDeviceFeatures);
+		}
+		free(pysicalDevices);
+	} else {
+		assert(0 && "Vulkan: 0 physical device avalable!");
 	}
 	return &(result->super);
 }

@@ -1,8 +1,12 @@
 enable_testing()
 
-add_executable(InitRequest InitRequestTest.cpp test.cpp)
+add_executable(CGPUDeviceTest 
+   DeviceInitialization.cpp 
+   VkDeviceExts.cpp 
+   test.cpp
+)
 
-target_link_libraries(InitRequest 
+target_link_libraries(CGPUDeviceTest 
    gtest_main
 )
-gtest_discover_tests(InitRequest)
+gtest_discover_tests(CGPUDeviceTest)
