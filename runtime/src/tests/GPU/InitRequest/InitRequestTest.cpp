@@ -78,7 +78,7 @@ TEST(CGpuTest, CreateVkInstance)
     vkDesc.ppInstanceExtensions = exts;
     vkDesc.mRequestAllAvailableQueues = true;
     
-    //auto vulkan_instance = cgpu_vulkan_create_instance(&vkDesc);
-    //EXPECT_TRUE( vulkan_instance != nullptr );
+    auto vulkan_instance = cgpu_vulkan_create_instance(&vkDesc);
+    EXPECT_TRUE( vulkan_instance != nullptr );
 }
 #endif

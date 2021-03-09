@@ -1,9 +1,5 @@
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
 #include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
-#ifdef _WIN32
-#include "windows.h"
-#include "vulkan/vulkan_win32.h"
-#endif
 #include <assert.h>
 
 #ifdef CGPU_USE_VULKAN
@@ -47,7 +43,20 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
     void* pUserData) 
 {
-	printf("[warning] validation layer: %s", pCallbackData->pMessage);
+	switch(messageSeverity)
+	{
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+			printf("[verbose]");break; 
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: 
+			printf("[info]");break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+			printf("[warning]"); break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT :
+			printf("[error]"); break;
+		default:
+			return VK_TRUE;
+	}
+	printf(" validation layer: %s\n", pCallbackData->pMessage); 
     return VK_FALSE;
 }
 
