@@ -73,7 +73,7 @@ uint32_t getProperGpuCount(IDXGIFactory6* pDXGIFactory)
         // Ignore Microsoft Driver
         if (!(desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE))
         {
-            uint32_t level_c = 0; CGPU_ARRAY_LEN(feature_levels, level_c);
+            uint32_t level_c = CGPU_ARRAY_LEN(feature_levels);
             for (uint32_t level = 0; level < level_c; ++level)
             {
                 // Make sure the adapter can support a D3D12 device

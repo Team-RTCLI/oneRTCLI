@@ -1,7 +1,7 @@
 #pragma once
 #include "cgpu_config.h"
 #include "stdbool.h"
-#define CGPU_ARRAY_LEN(array,len) {len = (sizeof(array) / sizeof(array[0]));}
+#define CGPU_ARRAY_LEN(array) ((sizeof(array) / sizeof(array[0])))
 
 #ifdef __cplusplus
 extern "C" {
