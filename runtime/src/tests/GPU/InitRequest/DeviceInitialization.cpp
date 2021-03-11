@@ -60,6 +60,29 @@ TEST_P(CGpuTest, AdapterEnum)
     cgpu_destroy_instance(instance);
 }
 
+TEST_P(CGpuTest, QueryQueueCount)
+{
+    ECGPUBackEnd backend = GetParam();
+    instance = init_instance(backend, true, true);
+    EXPECT_GT(enum_adapters(instance), 0);
+    size_t adapters_count = 0;
+    cgpu_enum_adapters(instance, nullptr, &adapters_count);
+    std::vector<CGpuAdapterId> adapters; adapters.resize(adapters_count);
+    cgpu_enum_adapters(instance, adapters.data(), &adapters_count);
+    for(auto adapter : adapters)
+    {
+        auto prop = cgpu_query_adapter_detail(adapter);
+        auto gQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Graphics);
+        auto cQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Compute);
+        auto tQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Transfer);
+        std::cout << prop.name << " of " << backend << "  "
+            << "GraphicsQueue: " << gQueue << "  "
+            << "ComputeQueue: " << cQueue << "  "
+            << "TransferQueue: " << tQueue << std::endl;
+    }
+    cgpu_destroy_instance(instance);
+}
+
 static const auto allPlatforms = testing::Values(
 
 #ifdef CGPU_USE_VULKAN

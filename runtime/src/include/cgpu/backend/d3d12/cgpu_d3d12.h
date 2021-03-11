@@ -14,6 +14,7 @@ CGpuInstanceId cgpu_create_instance_d3d12(CGpuInstanceDescriptor const* descript
 void cgpu_destroy_instance_d3d12(CGpuInstanceId instance);
 void cgpu_enum_adapters_d3d12(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 CGpuAdapterDetail cgpu_query_adapter_detail_d3d12(const CGpuAdapterId adapter);
+uint32_t cgpu_query_queue_count_d3d12(const CGpuAdapterId adapter, const ECGpuQueueType type);
 
 typedef struct CGpuInstance_D3D12 {
     CGpuInstance super;

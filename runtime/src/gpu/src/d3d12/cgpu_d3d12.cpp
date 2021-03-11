@@ -204,6 +204,12 @@ CGpuAdapterDetail cgpu_query_adapter_detail_d3d12(const CGpuAdapterId adapter)
     return d;
 }
 
+uint32_t cgpu_query_queue_count_d3d12(const CGpuAdapterId adapter, const ECGpuQueueType type)
+{
+    // queues are virtual in d3d12.
+    return UINT32_MAX;
+}
+
 #include "cgpu/backend/d3d12/cgpu_d3d12_exts.h"
 // extentions
 CGpuDREDSettingsId cgpu_d3d12_enable_DRED()

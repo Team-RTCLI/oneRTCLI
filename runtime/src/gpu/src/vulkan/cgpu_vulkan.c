@@ -51,7 +51,49 @@ CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter)
 
 uint32_t cgpu_query_queue_count_vulkan(const CGpuAdapterId adapter, const ECGpuQueueType type)
 {
-
+	CGpuAdapter_Vulkan* a = (CGpuAdapter_Vulkan*)adapter;
+	uint32_t count = 0;
+	switch (type)
+	{
+		case ECGpuQueueType_Graphics:
+		{
+			for(uint32_t i = 0; i < a->mQueueFamilyPropertiesCount; i++)
+			{
+				const VkQueueFamilyProperties* prop =  &a->pQueueFamilyProperties[i];
+				if(prop->queueFlags & VK_QUEUE_GRAPHICS_BIT)
+				{
+					count = prop->queueCount;
+				}
+			}
+		} break;
+		case ECGpuQueueType_Compute:
+		{
+			for(uint32_t i = 0; i < a->mQueueFamilyPropertiesCount; i++)
+			{
+				const VkQueueFamilyProperties* prop =  &a->pQueueFamilyProperties[i];
+				if(prop->queueFlags & VK_QUEUE_COMPUTE_BIT)
+					if(!(prop->queueFlags & VK_QUEUE_GRAPHICS_BIT))
+					{
+						count = prop->queueCount;
+					}
+			}
+		} break;
+		case ECGpuQueueType_Transfer:
+		{
+			for(uint32_t i = 0; i < a->mQueueFamilyPropertiesCount; i++)
+			{
+				const VkQueueFamilyProperties* prop =  &a->pQueueFamilyProperties[i];
+				if(prop->queueFlags & VK_QUEUE_TRANSFER_BIT)
+					if(!(prop->queueFlags & VK_QUEUE_COMPUTE_BIT))
+						if(!(prop->queueFlags & VK_QUEUE_GRAPHICS_BIT))
+						{
+							count = prop->queueCount;
+						}
+			}
+		} break;
+		default: assert(0 && "CGPU VULKAN: ERROR Queue Type!");
+	}
+	return count;
 }
 
 // exts

@@ -62,3 +62,8 @@ CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter)
 {
     return adapter->instance->proc_table->query_adapter_detail(adapter);
 }
+
+uint32_t cgpu_query_queue_count(const CGpuAdapterId adapter, const ECGpuQueueType type)
+{
+    return adapter->instance->proc_table->query_queue_count(adapter, type);
+}

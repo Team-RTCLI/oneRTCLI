@@ -134,8 +134,6 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, C
 				sizeof(VkQueueFamilyProperties) * VkAdapter.mQueueFamilyPropertiesCount);
 			vkGetPhysicalDeviceQueueFamilyProperties(pysicalDevices[i],
 				&VkAdapter.mQueueFamilyPropertiesCount, VkAdapter.pQueueFamilyProperties);
-
-				
 		}
 		free(pysicalDevices);
 	} else {
