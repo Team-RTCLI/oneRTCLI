@@ -6,6 +6,20 @@
 #include <memory>
 #include "cgpu/backend/webgpu/bridge.h"
 
+namespace impl
+{
+	/**
+	 * Dawn error handling callback (adheres to \c WGPUErrorCallback).
+	 *
+	 * \param[in] message error string
+	 */
+	static void printError(WGPUErrorType type, const char* message, void*)
+    {
+		printf("CGPU Dawn ERROR: %s\n", message);
+	}
+}
+
+
 #ifdef __EMSCRIPTEN__
 
 #else 
@@ -20,6 +34,11 @@ class GpuAdapterDawn : public CGpuAdapter_WebGpu
 public:
     dawn_native::Adapter dawn_native_adapter;
     wgpu::AdapterProperties properties;
+};
+
+class GpuDeviceDawn : public CGpuDevice_WebGpu
+{
+    
 };
 
 class GpuInstanceDawn : public CGpuInstance_WebGpu
@@ -101,6 +120,21 @@ WGPUBackendType cgpu_webgpu_query_backend(CGpuAdapterId adapter)
     return WGPUBackendType_Null;
 }
 
+
+CGpuDeviceId cgpu_create_device_webgpu(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc)
+{
+    auto a = (GpuAdapterDawn*)adapter;
+    GpuDeviceDawn* created = new GpuDeviceDawn();
+    if (a->dawn_native_adapter)
+    {
+        created->pWGPUDevice = a->dawn_native_adapter.CreateDevice();
+
+        DawnProcTable procs(dawn_native::GetProcs());
+		procs.deviceSetUncapturedErrorCallback(created->pWGPUDevice, impl::printError, nullptr);
+		dawnProcSetProcs(&procs);
+    }
+}
+
 #endif // end #ifdef __EMSCRIPTEN__
 
 
@@ -118,7 +152,11 @@ uint32_t cgpu_query_queue_count_webgpu(const CGpuAdapterId adapter, const ECGpuQ
     }
 }
 
-
+void cgpu_destroy_device_webgpu(CGpuDeviceId device)
+{
+    CGpuDevice_WebGpu* toDestroy = (CGpuDevice_WebGpu*)device;
+    delete toDestroy;
+}
 
 
 #endif // end #ifdef CGPU_USE_WEBGPU

@@ -207,6 +207,15 @@ CGpuAdapterDetail cgpu_query_adapter_detail_d3d12(const CGpuAdapterId adapter)
 uint32_t cgpu_query_queue_count_d3d12(const CGpuAdapterId adapter, const ECGpuQueueType type)
 {
     // queues are virtual in d3d12.
+    /*
+    switch(type)
+    {
+        case ECGpuQueueType_Graphics: return 1;
+        case ECGpuQueueType_Compute: return 2;
+        case ECGpuQueueType_Transfer: return 2;
+        default: return 0;
+    }
+    */
     return UINT32_MAX;
 }
 
