@@ -57,17 +57,19 @@ TEST_P(CGpuTest, AdapterEnum)
     ECGPUBackEnd backend = GetParam();
     instance = init_instance(backend, true, true);
     EXPECT_GT(enum_adapters(instance), 0);
+    cgpu_destroy_instance(instance);
 }
 
 static const auto allPlatforms = testing::Values(
-#ifdef CGPU_USE_WEBGPU
-    ECGPUBackEnd_WEBGPU
-#endif
+
 #ifdef CGPU_USE_VULKAN
-    , ECGPUBackEnd_VULKAN
+    ECGPUBackEnd_VULKAN
 #endif
 #ifdef CGPU_USE_D3D12
     ,ECGPUBackEnd_D3D12
+#endif
+#ifdef CGPU_USE_WEBGPU
+    ,ECGPUBackEnd_WEBGPU
 #endif
 );
 INSTANTIATE_TEST_SUITE_P(DeviceInitialization, CGpuTest, allPlatforms);

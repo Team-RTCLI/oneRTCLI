@@ -10,7 +10,8 @@ const CGpuProcTable tbl_vk =
     .create_instance = &cgpu_create_instance_vulkan,
     .destroy_instance = &cgpu_destroy_instance_vulkan,
 	.enum_adapters = &cgpu_enum_adapters_vulkan,
-	.query_adapter_detail = &cgpu_query_adapter_detail_vulkan
+	.query_adapter_detail = &cgpu_query_adapter_detail_vulkan,
+	.query_queue_count = &cgpu_query_queue_count_vulkan
 };
 
 const CGpuProcTable* CGPU_VulkanProcTable()
@@ -46,6 +47,11 @@ CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter)
 	d.vendorId = a->mPhysicalDeviceProps.vendorID;
 	d.name = a->mPhysicalDeviceProps.deviceName;
     return d;
+}
+
+uint32_t cgpu_query_queue_count_vulkan(const CGpuAdapterId adapter, const ECGpuQueueType type)
+{
+
 }
 
 // exts

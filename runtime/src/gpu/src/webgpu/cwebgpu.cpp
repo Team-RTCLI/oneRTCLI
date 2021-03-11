@@ -100,12 +100,23 @@ WGPUBackendType cgpu_webgpu_query_backend(CGpuAdapterId adapter)
     }
     return WGPUBackendType_Null;
 }
+
 #endif // end #ifdef __EMSCRIPTEN__
 
 
 // common implementations
 
-
+uint32_t cgpu_query_queue_count_webgpu(const CGpuAdapterId adapter, const ECGpuQueueType type)
+{
+    switch (type)
+    {
+        // WGPU Supports only main-queue now.
+        case ECGpuQueueType_Graphics: return 1;
+        case ECGpuQueueType_Compute:  return 0;
+        case ECGpuQueueType_Transfer: return 0;
+        default: assert(0 && "WGPU ERROR QueueType!");
+    }
+}
 
 
 

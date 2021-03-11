@@ -15,6 +15,7 @@
 #if !defined(XBOX)
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dxcompiler.lib")
 #endif
 
@@ -39,7 +40,7 @@ void optionalEnableDebugLayer(CGpuInstance_D3D12* result, CGpuInstanceDescriptor
 {
     if(descriptor->enableDebugLayer)
     {
-        if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(result->pDXDebug), (void**)&(result->pDXDebug))))
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&result->pDXDebug))))
         {
             result->pDXDebug->EnableDebugLayer();
             if(descriptor->enableGpuBasedValidation)
@@ -48,7 +49,7 @@ void optionalEnableDebugLayer(CGpuInstance_D3D12* result, CGpuInstanceDescriptor
                 if (SUCCEEDED(result->pDXDebug->QueryInterface(IID_PPV_ARGS(&pDebug1))))
                 {
                     pDebug1->SetEnableGPUBasedValidation(descriptor->enableGpuBasedValidation);
-                    pDebug1->Release();
+                    pDebug1->Release(); 
                 }
             }
         }
@@ -100,6 +101,7 @@ void getProperGpuCount(CGpuInstance_D3D12* instance, uint32_t* count, bool* foun
         } else
         {
             *foundSoftwareAdapter = true;
+            adapter->Release();
         }
     }
     *count = instance->mAdaptersCount;
@@ -153,8 +155,29 @@ CGpuInstanceId cgpu_create_instance_d3d12(CGpuInstanceDescriptor const* descript
 void cgpu_destroy_instance_d3d12(CGpuInstanceId instance)
 {
     CGpuInstance_D3D12* result = (CGpuInstance_D3D12*)instance;
-    if(result->pDXDebug) result->pDXDebug->Release();
+    if(result->mAdaptersCount > 0)
+    {
+        for(uint32_t i = 0; i < result->mAdaptersCount; i++)
+        {
+            result->pAdapters[i].pDxActiveGPU->Release();
+        }
+    }
     result->pDXGIFactory->Release();
+    if(result->pDXDebug)
+    {
+        result->pDXDebug->Release();
+    }
+#ifdef _DEBUG
+    {
+        IDXGIDebug1* dxgiDebug;
+        if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug))))
+        {
+            dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, 
+                DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+        }
+        dxgiDebug->Release();
+    }
+#endif
     delete result;
 }
 

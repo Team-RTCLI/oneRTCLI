@@ -120,10 +120,22 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, C
 		vkEnumeratePhysicalDevices(result->mVkInstance, &result->mPhysicalDeviceCount, pysicalDevices);
 		for(uint32_t i = 0; i < result->mPhysicalDeviceCount; i++)
 		{
-			result->pVulkanAdapters[i].super.instance = &result->super;
-			result->pVulkanAdapters[i].mPhysicalDevice = pysicalDevices[i];
-			vkGetPhysicalDeviceProperties(pysicalDevices[i], &result->pVulkanAdapters[i].mPhysicalDeviceProps);
-			vkGetPhysicalDeviceFeatures(pysicalDevices[i], &result->pVulkanAdapters[i].mPhysicalDeviceFeatures);
+			auto& VkAdapter = result->pVulkanAdapters[i];
+			VkAdapter.super.instance = &result->super;
+			VkAdapter.mPhysicalDevice = pysicalDevices[i];
+			vkGetPhysicalDeviceProperties(pysicalDevices[i], &VkAdapter.mPhysicalDeviceProps);
+			vkGetPhysicalDeviceFeatures(pysicalDevices[i], &VkAdapter.mPhysicalDeviceFeatures);
+
+			// Query Queue Information.
+			uint32_t queueFamilyCount = 0;
+			vkGetPhysicalDeviceQueueFamilyProperties(pysicalDevices[i],
+				&VkAdapter.mQueueFamilyPropertiesCount, nullptr);
+			VkAdapter.pQueueFamilyProperties = (VkQueueFamilyProperties*)malloc(
+				sizeof(VkQueueFamilyProperties) * VkAdapter.mQueueFamilyPropertiesCount);
+			vkGetPhysicalDeviceQueueFamilyProperties(pysicalDevices[i],
+				&VkAdapter.mQueueFamilyPropertiesCount, VkAdapter.pQueueFamilyProperties);
+
+				
 		}
 		free(pysicalDevices);
 	} else {

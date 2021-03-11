@@ -80,8 +80,6 @@ typedef CGpuQueue* CGpuQueueId;
 typedef struct CGpuDevice {const char* label;} CGpuDevice;
 typedef CGpuDevice* CGpuDeviceId;
 
-
-
 typedef struct CGpuInstance* CGpuInstanceId;
 
 CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc);
@@ -96,8 +94,8 @@ typedef void (*CGPUProcEnumAdapters)(CGpuInstanceId instance, CGpuAdapterId* con
 CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter);
 typedef CGpuAdapterDetail (*CGPUProcQueryAdapterDetail)(const CGpuAdapterId instance);
 
-uint32_t cgpu_query_queue_count(const ECGpuQueueType type);
-typedef uint32_t (*CGPUProcQueryQueueCount)(const ECGpuQueueType type);
+uint32_t cgpu_query_queue_count(const CGpuAdapterId adapter, const ECGpuQueueType type);
+typedef uint32_t (*CGPUProcQueryQueueCount)(const CGpuAdapterId adapter, const ECGpuQueueType type);
 
 CGpuDeviceId cgpu_create_device(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
 typedef CGpuDeviceId (*CGPUProcCreateDevice)(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
