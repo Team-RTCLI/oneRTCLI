@@ -12,7 +12,9 @@ const CGpuProcTable tbl_d3d12 =
     .create_device = &cgpu_create_device_d3d12,
     .free_device = &cgpu_free_device_d3d12,
     .get_queue = &cgpu_get_queue_d3d12,
-    .free_queue = &cgpu_free_queue_d3d12
+    .free_queue = &cgpu_free_queue_d3d12,
+    .create_command_encoder = &cgpu_create_command_encoder_d3d12,
+    .free_command_encoder = &cgpu_free_command_encoder_d3d12
 };
 
 const CGpuProcTable* CGPU_D3D12ProcTable()

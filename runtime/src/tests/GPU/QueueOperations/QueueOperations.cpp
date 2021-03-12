@@ -66,6 +66,25 @@ TEST_P(QueueOperations, GetGraphicsQueue)
     }
 }
 
+TEST_P(QueueOperations, CreateCommandEncoder)
+{
+    CGpuQueueId graphicsQueue;
+    auto gQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Graphics); 
+    if (gQueue > 0)
+    {
+        graphicsQueue = cgpu_get_queue(device, ECGpuQueueType_Graphics, 0);
+        EXPECT_NE(graphicsQueue, CGPU_NULLPTR);
+        EXPECT_NE(graphicsQueue, nullptr);
+
+        auto encoder = cgpu_create_command_encoder(graphicsQueue, nullptr);
+        EXPECT_NE(encoder, CGPU_NULLPTR);
+        EXPECT_NE(encoder, nullptr);
+
+        cgpu_free_command_encoder(encoder);
+        cgpu_free_queue(graphicsQueue);
+    }
+}
+
 static const auto allPlatforms = testing::Values(
 #ifndef TEST_WEBGPU    
     #ifdef CGPU_USE_VULKAN

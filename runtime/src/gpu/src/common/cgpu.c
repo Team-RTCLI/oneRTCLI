@@ -120,3 +120,29 @@ void cgpu_free_queue(CGpuQueueId queue)
 
     return queue->device->adapter->instance->proc_table->free_queue(queue);
 }
+
+CGPU_API CGpuCommandEncoderId cgpu_create_command_encoder(CGpuQueueId queue,
+    const CGpuCommandEncoderDescriptor* desc)
+{
+    assert(queue != CGPU_NULLPTR && "fatal: call on NULL queue!");
+    assert(queue->device != CGPU_NULLPTR && "fatal: call on NULL device!");
+    assert(queue->device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
+    assert(queue->device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
+    assert(queue->device->adapter->instance->proc_table->free_device && "free_device Proc Missing!");
+
+    CGpuCommandEncoderId encoder = queue->device->adapter->instance->proc_table->create_command_encoder(queue, desc);
+    encoder->queue = queue;
+    return encoder;
+}
+
+CGPU_API void cgpu_free_command_encoder(CGpuCommandEncoderId encoder)
+{
+    assert(encoder != CGPU_NULLPTR && "fatal: call on NULL encoder!");
+    assert(encoder->queue != CGPU_NULLPTR && "fatal: call on NULL queue!");
+    assert(encoder->queue->device != CGPU_NULLPTR && "fatal: call on NULL device!");
+    assert(encoder->queue->device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
+    assert(encoder->queue->device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
+    assert(encoder->queue->device->adapter->instance->proc_table->free_device && "free_device Proc Missing!");
+
+    return encoder->queue->device->adapter->instance->proc_table->free_command_encoder(encoder);
+}

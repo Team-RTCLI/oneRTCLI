@@ -138,41 +138,15 @@ CGpuDeviceId cgpu_create_device_webgpu(CGpuAdapterId adapter, const CGpuDeviceDe
     return &created->super;
 }
 
-#endif // end #ifdef __EMSCRIPTEN__
-
-
-// common implementations
-
-uint32_t cgpu_query_queue_count_webgpu(const CGpuAdapterId adapter, const ECGpuQueueType type)
-{
-    switch (type)
-    {
-        // WGPU Supports only main-queue now.
-        case ECGpuQueueType_Graphics: return 1;
-        case ECGpuQueueType_Compute:  return 0;
-        case ECGpuQueueType_Transfer: return 0;
-        default: assert(0 && "WGPU ERROR QueueType!");
-    }
-    return UINT32_MAX;
-}
-
 void cgpu_free_device_webgpu(CGpuDeviceId device)
 {
     CGpuDevice_WebGpu* toDestroy = (CGpuDevice_WebGpu*)device;
     delete toDestroy;
 }
 
-CGpuQueueId cgpu_get_queue_webgpu(CGpuDeviceId device, ECGpuQueueType type, uint32_t index)
-{
-    CGpuDevice_WebGpu* wgpuDevice = (CGpuDevice_WebGpu*)device;
-    CGpuQueue_WebGpu* wgpuQueue = (CGpuQueue_WebGpu*)malloc(sizeof(CGpuQueue_WebGpu));
-    wgpuQueue->pWGPUQueue = wgpuDeviceGetDefaultQueue(wgpuDevice->pWGPUDevice);
-    return &wgpuQueue->super;
-}
+#endif // end #ifdef __EMSCRIPTEN__
 
-void cgpu_free_queue_webgpu(CGpuQueueId queue)
-{
-    free(queue);
-}
+
+
 
 #endif // end #ifdef CGPU_USE_WEBGPU

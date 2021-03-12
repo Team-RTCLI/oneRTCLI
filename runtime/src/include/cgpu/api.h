@@ -70,7 +70,7 @@ typedef struct CGpuDeviceDescriptor {
 } CGpuDeviceDescriptor;
 
 typedef struct CGpuCommandEncoderDescriptor {
-    bool transient;
+    uint32_t ___nothing_and_useless__;
 } CGpuCommandEncoderDescriptor;
 
 typedef struct CGpuInstance* CGpuInstanceId;
@@ -128,9 +128,9 @@ CGPU_API void cgpu_free_queue(CGpuQueueId queue);
 typedef void (*CGPUProcFreeQueue)(CGpuQueueId queue);
 
 CGPU_API CGpuCommandEncoderId cgpu_create_command_encoder(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
-typedef void (*CGPUProcCreateCommandEncoder)(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
-CGPU_API void cgpu_free_command_encoder(CGpuCommandEncoderId pool);
-typedef void (*CGPUProcFreeCommandEncoder)(CGpuCommandEncoderId pool);
+typedef CGpuCommandEncoderId (*CGPUProcCreateCommandEncoder)(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
+CGPU_API void cgpu_free_command_encoder(CGpuCommandEncoderId encoder);
+typedef void (*CGPUProcFreeCommandEncoder)(CGpuCommandEncoderId encoder);
 
 
 CGPU_API void cgpu_cmd_set_viewport(CGpuCommandBufferId cmd, float x, float y, float width, float height,

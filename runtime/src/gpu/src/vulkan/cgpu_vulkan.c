@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #ifdef CGPU_USE_VULKAN
+#define GLOBAL_VkAllocationCallbacks CGPU_NULLPTR
 
 const CGpuProcTable tbl_vk = 
 {
@@ -17,7 +18,9 @@ const CGpuProcTable tbl_vk =
 	.create_device = &cgpu_create_device_vulkan,
 	.free_device = &cgpu_free_device_vulkan,
 	.get_queue = &cgpu_get_queue_vulkan,
-	.free_queue = &cgpu_free_queue_vulkan
+	.free_queue = &cgpu_free_queue_vulkan,
+	.create_command_encoder = &cgpu_create_command_encoder_vulkan,
+	.free_command_encoder = &cgpu_free_command_encoder_vulkan
 };
 
 const CGpuProcTable* CGPU_VulkanProcTable()
@@ -116,6 +119,54 @@ CGpuQueueId cgpu_get_queue_vulkan(CGpuDeviceId device, ECGpuQueueType type, uint
 void cgpu_free_queue_vulkan(CGpuQueueId queue)
 {
 	free(queue);
+}
+
+VkCommandPool allocate_transient_command_pool(CGpuDevice_Vulkan* D, CGpuQueueId queue)
+{
+	VkCommandPool P = VK_NULL_HANDLE;
+	CGpuQueue_Vulkan* Q = (CGpuQueue_Vulkan*)queue;
+	CGpuAdapter_Vulkan* A = (CGpuAdapter_Vulkan*)queue->device->adapter;
+
+	VkCommandPoolCreateInfo create_info = {0};
+	create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	create_info.pNext = NULL;
+	// transient.
+	create_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
+	create_info.queueFamilyIndex = A->mQueueFamilyIndices[queue->type];
+
+	if( VK_SUCCESS != 
+#ifdef VK_USE_VOLK_DEVICE_TABLE 
+	D->mVkDeviceTable.
+#endif
+		vkCreateCommandPool(D->pVkDevice, &create_info, GLOBAL_VkAllocationCallbacks, &P) )
+	{
+		assert(0 && "CGPU VULKAN: CREATE COMMAND POOL FAILED!");
+	}
+	return P;
+}
+
+void free_transient_command_pool(CGpuDevice_Vulkan* D, VkCommandPool pool)
+{
+#ifdef VK_USE_VOLK_DEVICE_TABLE 
+	D->mVkDeviceTable.
+#endif
+		vkDestroyCommandPool(D->pVkDevice, pool, GLOBAL_VkAllocationCallbacks);
+}
+
+CGpuCommandEncoderId cgpu_create_command_encoder_vulkan(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc)
+{
+	CGpuDevice_Vulkan* D = (CGpuDevice_Vulkan*)queue->device;
+	CGpuCommandEncoder_Vulkan* E = (CGpuCommandEncoder_Vulkan*)malloc(sizeof(CGpuCommandEncoder_Vulkan));
+	E->pVkCmdPool = allocate_transient_command_pool(D, queue);
+	return &E->super;
+}
+
+void cgpu_free_command_encoder_vulkan(CGpuCommandEncoderId encoder)
+{
+	CGpuDevice_Vulkan* D = (CGpuDevice_Vulkan*)encoder->queue->device;
+	CGpuCommandEncoder_Vulkan* E  = (CGpuCommandEncoder_Vulkan*)encoder;
+	free_transient_command_pool(D, E->pVkCmdPool);
+	free(encoder);
 }
 
 // exts

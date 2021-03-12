@@ -6,6 +6,10 @@
 extern "C" {
 #endif
 
+#ifndef VK_USE_VOLK_DEVICE_TABLE
+#define VK_USE_VOLK_DEVICE_TABLE
+#endif 
+
 const CGpuProcTable* CGPU_VulkanProcTable();
 
 CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descriptor);
@@ -17,6 +21,8 @@ CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDe
 void cgpu_free_device_vulkan(CGpuDeviceId device);
 CGpuQueueId cgpu_get_queue_vulkan(CGpuDeviceId device, ECGpuQueueType type, uint32_t index);
 void cgpu_free_queue_vulkan(CGpuQueueId queue);
+CGpuCommandEncoderId cgpu_create_command_encoder_vulkan(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
+void cgpu_free_command_encoder_vulkan(CGpuCommandEncoderId pool);
 
 typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;
@@ -46,6 +52,11 @@ typedef struct CGpuQueue_Vulkan {
     CGpuQueue super;
     VkQueue pVkQueue;
 } CGpuQueue_Vulkan;
+
+typedef struct CGpuCommandEncoder_Vulkan {
+    CGpuCommandEncoder super;
+    VkCommandPool pVkCmdPool;
+} CGpuCommandEncoder_Vulkan;
 
 #ifdef __cplusplus
 } // end extern "C"

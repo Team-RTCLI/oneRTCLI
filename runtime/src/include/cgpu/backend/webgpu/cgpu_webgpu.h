@@ -45,7 +45,7 @@ typedef struct CGpuQueue_WebGpu {
 
 typedef struct CGpuCommandEncoder_WebGpu {
     CGpuCommandEncoder super;
-    
+    WGPUCommandEncoder pWGPUEncoder;
 } CGpuCommandEncoder_WebGpu;
 
 #ifdef __cplusplus
