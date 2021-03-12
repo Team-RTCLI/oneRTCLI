@@ -1,3 +1,5 @@
+#define DLL_IMPLEMENTATION
+
 #include "cgpu/api.h"
 #ifdef CGPU_USE_WEBGPU
 
@@ -160,5 +162,17 @@ void cgpu_destroy_device_webgpu(CGpuDeviceId device)
     delete toDestroy;
 }
 
+CGpuQueueId cgpu_get_queue_webgpu(CGpuDeviceId device, ECGpuQueueType type, uint32_t index)
+{
+    CGpuDevice_WebGpu* wgpuDevice = (CGpuDevice_WebGpu*)device;
+    CGpuQueue_WebGpu* wgpuQueue = (CGpuQueue_WebGpu*)malloc(sizeof(CGpuQueue_WebGpu));
+    wgpuQueue->pWGPUQueue = wgpuDeviceGetDefaultQueue(wgpuDevice->pWGPUDevice);
+    return &wgpuQueue->super;
+}
+
+void cgpu_free_queue_webgpu(CGpuQueueId queue)
+{
+    free(queue);
+}
 
 #endif // end #ifdef CGPU_USE_WEBGPU

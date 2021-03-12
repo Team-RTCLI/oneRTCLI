@@ -19,6 +19,8 @@ CGpuAdapterDetail cgpu_query_adapter_detail_webgpu(const CGpuAdapterId adapter);
 uint32_t cgpu_query_queue_count_webgpu(const CGpuAdapterId adapter, const ECGpuQueueType type);
 CGpuDeviceId cgpu_create_device_webgpu(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
 void cgpu_destroy_device_webgpu(CGpuDeviceId device);
+CGpuQueueId cgpu_get_queue_webgpu(CGpuDeviceId device, ECGpuQueueType type, uint32_t index);
+void cgpu_free_queue_webgpu(CGpuQueueId queue);
 
 typedef struct CGpuInstance_WebGpu {
     CGpuInstance super;
@@ -33,6 +35,11 @@ typedef struct CGpuDevice_WebGpu {
     CGpuDevice super;
     WGPUDevice pWGPUDevice;
 } CGpuDevice_WebGpu;
+
+typedef struct CGpuQueue_WebGpu {
+    CGpuQueue super;
+    WGPUQueue pWGPUQueue;
+} CGpuQueue_WebGpu;
 
 #ifdef __cplusplus
 } // end extern "C"

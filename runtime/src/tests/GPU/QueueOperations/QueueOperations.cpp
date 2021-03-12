@@ -59,7 +59,10 @@ TEST_P(QueueOperations, GetGraphicsQueue)
     auto gQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Graphics); 
     if (gQueue > 0)
     {
-        //graphicsQueue = cgpu_get_queue(device, ECGpuQueueType_Graphics, 0);
+        graphicsQueue = cgpu_get_queue(device, ECGpuQueueType_Graphics, 0);
+        EXPECT_NE(graphicsQueue, CGPU_NULLPTR);
+        EXPECT_NE(graphicsQueue, nullptr);
+        cgpu_free_queue(graphicsQueue);
     }
 }
 

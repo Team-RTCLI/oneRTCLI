@@ -20,7 +20,7 @@ typedef struct CGpuVulkanInstanceDescriptor {
 } CGpuVulkanInstanceDescriptor;
 
 // api extentions.
-CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, CGpuVulkanInstanceDescriptor const* exts);
+CGPU_API CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, CGpuVulkanInstanceDescriptor const* exts);
 
 #ifdef __cplusplus
 } // end extern "C"

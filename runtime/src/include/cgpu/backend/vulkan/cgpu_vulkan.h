@@ -37,6 +37,7 @@ typedef struct CGpuAdapter_Vulkan {
 typedef struct CGpuDevice_Vulkan {
     CGpuDevice super;
     VkDevice pVkDevice;
+    struct VolkDeviceTable mVkDeviceTable;
 } CGpuDevice_Vulkan;
 
 #ifdef __cplusplus

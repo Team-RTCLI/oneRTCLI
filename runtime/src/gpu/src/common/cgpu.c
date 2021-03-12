@@ -105,5 +105,18 @@ CGpuQueueId cgpu_get_queue(CGpuDeviceId device, ECGpuQueueType type, uint32_t in
     assert(device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
     assert(device->adapter->instance->proc_table->destroy_device && "destroy_device Proc Missing!");
 
-    return device->adapter->instance->proc_table->get_queue(device, type, index);
+    CGpuQueueId queue = device->adapter->instance->proc_table->get_queue(device, type, index);
+    queue->index = index; queue->type = type; queue->device = device;
+    return queue;
+}
+
+void cgpu_free_queue(CGpuQueueId queue)
+{
+    assert(queue != CGPU_NULLPTR && "fatal: call on NULL queue!");
+    assert(queue->device != CGPU_NULLPTR && "fatal: call on NULL device!");
+    assert(queue->device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
+    assert(queue->device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
+    assert(queue->device->adapter->instance->proc_table->destroy_device && "destroy_device Proc Missing!");
+
+    return queue->device->adapter->instance->proc_table->free_queue(queue);
 }

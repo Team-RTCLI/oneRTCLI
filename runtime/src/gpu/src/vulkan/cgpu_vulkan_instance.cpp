@@ -1,3 +1,5 @@
+#define DLL_IMPLEMENTATION
+
 #include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
 #include <cassert>
@@ -249,11 +251,11 @@ CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDe
 	}
 
 	if (vkCreateDevice(a->mPhysicalDevice, &createInfo, nullptr, &vkDevice->pVkDevice) != VK_SUCCESS) {
-		assert("failed to create logical device!");
+		assert(0 && "failed to create logical device!");
 	}
 
 	// Single Device Only.
-	volkLoadDevice(vkDevice->pVkDevice);
+	volkLoadDeviceTable(&vkDevice->mVkDeviceTable, vkDevice->pVkDevice);
 
 	return &vkDevice->super;
 }

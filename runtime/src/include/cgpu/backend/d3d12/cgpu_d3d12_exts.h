@@ -13,11 +13,11 @@ typedef CGpuDREDSettings* CGpuDREDSettingsId;
 
 // Modifications to DRED settings have no effect on devices already created. 
 // But subsequent calls to D3D12CreateDevice use the most recent DRED settings.
-CGpuDREDSettingsId cgpu_d3d12_enable_DRED();
+CGPU_API CGpuDREDSettingsId cgpu_d3d12_enable_DRED();
 
 // Modifications to DRED settings have no effect on devices already created. 
 // But subsequent calls to D3D12CreateDevice use the most recent DRED settings.
-void cgpu_d3d12_disable_DRED(CGpuDREDSettingsId settings);
+CGPU_API void cgpu_d3d12_disable_DRED(CGpuDREDSettingsId settings);
 
 #ifdef __cplusplus
 } // end extern "C"

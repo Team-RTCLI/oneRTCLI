@@ -1,3 +1,5 @@
+#define DLL_IMPLEMENTATION
+
 #include "cgpu/backend/d3d12/cgpu_d3d12.h"
 #include <assert.h>
 #include <stdlib.h>

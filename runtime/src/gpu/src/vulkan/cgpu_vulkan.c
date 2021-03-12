@@ -1,3 +1,5 @@
+#define DLL_IMPLEMENTATION
+
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
 #include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
 #include <assert.h>

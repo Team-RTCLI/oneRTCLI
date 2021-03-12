@@ -1,11 +1,11 @@
 enable_testing()
 
-add_executable(CGPUDeviceTest 
+add_executable(CGPUExts 
    VkDeviceExts.cpp 
    D3DDeviceExts.cpp
 )
 
-target_link_libraries(CGPUDeviceTest 
+target_link_libraries(CGPUExts 
    gtest_main
 )
-gtest_discover_tests(CGPUDeviceTest)
+gtest_discover_tests(CGPUExts)
