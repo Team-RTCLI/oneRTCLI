@@ -15,6 +15,8 @@ void cgpu_destroy_instance_d3d12(CGpuInstanceId instance);
 void cgpu_enum_adapters_d3d12(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 CGpuAdapterDetail cgpu_query_adapter_detail_d3d12(const CGpuAdapterId adapter);
 uint32_t cgpu_query_queue_count_d3d12(const CGpuAdapterId adapter, const ECGpuQueueType type);
+CGpuDeviceId cgpu_create_device_d3d12(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
+void cgpu_destroy_device_d3d12(CGpuDeviceId device);
 
 typedef struct CGpuInstance_D3D12 {
     CGpuInstance super;
@@ -46,6 +48,20 @@ typedef struct CGpuAdapter_D3D12 {
     char                            mDescription[128];
 } CGpuAdapter_D3D12;
 
+typedef struct CGpuDevice_D3D12 {
+    CGpuDevice super;
+    ID3D12Device* pDxDevice; 
+    ID3D12CommandQueue** const ppCommandQueues[ECGpuQueueType_Count]
+#ifdef __cplusplus
+    = {}
+#endif
+    ;
+    const uint32_t pCommandQueueCounts[ECGpuQueueType_Count]
+#ifdef __cplusplus
+    = {}
+#endif
+    ;
+} CGpuDevice_D3D12;
 
 #ifdef __cplusplus
 } // end extern "C"

@@ -60,8 +60,8 @@ typedef enum ECGpuQueueType{
 } ECGpuQueueType;
 
 typedef struct CGpuQueueGroupDescriptor {
-    ECGpuQueueType type;
-    CGpuQueueIndex index;
+    ECGpuQueueType queueType;
+    uint32_t queueCount;
 } CGpuQueueGroupDescriptor;
 
 typedef struct CGpuDeviceDescriptor {
@@ -77,7 +77,12 @@ typedef CGpuAdapter* CGpuAdapterId;
 typedef struct CGpuQueue {ECGpuQueueType type; CGpuQueueIndex index;} CGpuQueue;
 typedef CGpuQueue* CGpuQueueId;
 
-typedef struct CGpuDevice {const char* label;} CGpuDevice;
+typedef struct CGpuDevice {
+    const CGpuAdapterId adapter;
+#ifdef __cplusplus
+    CGpuDevice() :adapter(CGPU_NULLPTR) {}
+#endif
+} CGpuDevice;
 typedef CGpuDevice* CGpuDeviceId;
 
 typedef struct CGpuInstance* CGpuInstanceId;
@@ -104,7 +109,7 @@ void cgpu_destroy_device(CGpuDeviceId device);
 typedef void (*CGPUProcDestroyDevice)(CGpuDeviceId device);
 
 
-typedef struct CGpuBuffer {const char* label;} CGpuBuffer;
+typedef struct CGpuBuffer {const CGpuDeviceId device;} CGpuBuffer;
 typedef CGpuBuffer* CGpuBufferId;
 
 

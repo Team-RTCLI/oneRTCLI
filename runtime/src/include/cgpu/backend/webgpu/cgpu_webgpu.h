@@ -32,9 +32,6 @@ typedef struct CGpuAdapter_WebGpu {
 typedef struct CGpuDevice_WebGpu {
     CGpuDevice super;
     WGPUDevice pWGPUDevice;
-#ifdef __cplusplus
-    virtual ~CGpuDevice_WebGpu() {}
-#endif
 } CGpuDevice_WebGpu;
 
 #ifdef __cplusplus

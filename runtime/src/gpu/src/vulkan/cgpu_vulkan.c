@@ -11,7 +11,9 @@ const CGpuProcTable tbl_vk =
     .destroy_instance = &cgpu_destroy_instance_vulkan,
 	.enum_adapters = &cgpu_enum_adapters_vulkan,
 	.query_adapter_detail = &cgpu_query_adapter_detail_vulkan,
-	.query_queue_count = &cgpu_query_queue_count_vulkan
+	.query_queue_count = &cgpu_query_queue_count_vulkan,
+	.create_device = &cgpu_create_device_vulkan,
+	.destroy_device = &cgpu_destroy_device_vulkan
 };
 
 const CGpuProcTable* CGPU_VulkanProcTable()
@@ -62,7 +64,7 @@ uint32_t cgpu_query_queue_count_vulkan(const CGpuAdapterId adapter, const ECGpuQ
 				const VkQueueFamilyProperties* prop =  &a->pQueueFamilyProperties[i];
 				if(prop->queueFlags & VK_QUEUE_GRAPHICS_BIT)
 				{
-					count = prop->queueCount;
+					count += prop->queueCount;
 				}
 			}
 		} break;
@@ -74,7 +76,7 @@ uint32_t cgpu_query_queue_count_vulkan(const CGpuAdapterId adapter, const ECGpuQ
 				if(prop->queueFlags & VK_QUEUE_COMPUTE_BIT)
 					if(!(prop->queueFlags & VK_QUEUE_GRAPHICS_BIT))
 					{
-						count = prop->queueCount;
+						count += prop->queueCount;
 					}
 			}
 		} break;
@@ -87,7 +89,7 @@ uint32_t cgpu_query_queue_count_vulkan(const CGpuAdapterId adapter, const ECGpuQ
 					if(!(prop->queueFlags & VK_QUEUE_COMPUTE_BIT))
 						if(!(prop->queueFlags & VK_QUEUE_GRAPHICS_BIT))
 						{
-							count = prop->queueCount;
+							count += prop->queueCount;
 						}
 			}
 		} break;

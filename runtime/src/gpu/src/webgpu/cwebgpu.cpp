@@ -36,9 +36,9 @@ public:
     wgpu::AdapterProperties properties;
 };
 
-class GpuDeviceDawn : public CGpuDevice_WebGpu
+struct GpuDeviceDawn : public CGpuDevice_WebGpu
 {
-    
+
 };
 
 class GpuInstanceDawn : public CGpuInstance_WebGpu
@@ -85,8 +85,7 @@ void cgpu_enum_adapters_webgpu(CGpuInstanceId instance, CGpuAdapterId* const ada
     assert(instance != nullptr && "fatal: null instance!");
     GpuInstanceDawn* wgpuInstance = (GpuInstanceDawn*)instance;
     *adapters_num = wgpuInstance->dawn_adapters.size();
-    if(!adapters)
-    {
+    if(!adapters) {
         return;
     } else {
         for(auto i = 0u; i < *adapters_num; i++)
@@ -128,11 +127,13 @@ CGpuDeviceId cgpu_create_device_webgpu(CGpuAdapterId adapter, const CGpuDeviceDe
     if (a->dawn_native_adapter)
     {
         created->pWGPUDevice = a->dawn_native_adapter.CreateDevice();
+        *const_cast<CGpuAdapterId*>(&created->super.adapter) = adapter;
 
         DawnProcTable procs(dawn_native::GetProcs());
 		procs.deviceSetUncapturedErrorCallback(created->pWGPUDevice, impl::printError, nullptr);
 		dawnProcSetProcs(&procs);
     }
+    return &created->super;
 }
 
 #endif // end #ifdef __EMSCRIPTEN__
@@ -150,6 +151,7 @@ uint32_t cgpu_query_queue_count_webgpu(const CGpuAdapterId adapter, const ECGpuQ
         case ECGpuQueueType_Transfer: return 0;
         default: assert(0 && "WGPU ERROR QueueType!");
     }
+    return UINT32_MAX;
 }
 
 void cgpu_destroy_device_webgpu(CGpuDeviceId device)

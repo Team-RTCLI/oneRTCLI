@@ -40,6 +40,13 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "any": "c",
+        "array": "c",
+        "chrono": "c",
+        "functional": "c",
+        "future": "c",
+        "ratio": "c",
+        "variant": "c"
     }
 }

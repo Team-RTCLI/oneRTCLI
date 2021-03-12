@@ -1,7 +1,7 @@
 enable_testing()
 
 add_executable(CGPUDeviceTest 
-   DeviceInitialization.cpp 
+   DeviceInitialize.cpp 
    VkDeviceExts.cpp 
    D3DDeviceExts.cpp
 )

@@ -219,6 +219,69 @@ uint32_t cgpu_query_queue_count_d3d12(const CGpuAdapterId adapter, const ECGpuQu
     return UINT32_MAX;
 }
 
+CGpuDeviceId cgpu_create_device_d3d12(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc)
+{
+    const CGpuAdapter_D3D12* A = (CGpuAdapter_D3D12*)adapter;
+    CGpuDevice_D3D12* cgpuD3D12Device = new CGpuDevice_D3D12();
+    *const_cast<CGpuAdapterId*>(&cgpuD3D12Device->super.adapter) = adapter;
+    
+    if(!SUCCEEDED(D3D12CreateDevice(
+		A->pDxActiveGPU,             // default adapter
+		A->mFeatureLevel,
+		IID_PPV_ARGS(&cgpuD3D12Device->pDxDevice)
+    ))) {
+        assert("[D3D12 Fatal]: Create D3D12Device Failed!");
+    }
+
+    // Create Requested Queues.
+    for(uint32_t i = 0u; i < desc->queueGroupCount; i++)
+    {
+        const auto& queueGroup = desc->queueGroups[i];
+        const auto queueType = queueGroup.queueType;
+
+        *const_cast<uint32_t*>(&cgpuD3D12Device->pCommandQueueCounts[i]) =
+            queueGroup.queueCount;
+        *const_cast<ID3D12CommandQueue***>(&cgpuD3D12Device->ppCommandQueues[queueType]) = 
+            (ID3D12CommandQueue**)malloc(sizeof(ID3D12CommandQueue*) * queueGroup.queueCount);
+
+        for(uint32_t j = 0u; j < queueGroup.queueCount; j++)
+        {
+            D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+            switch (queueType)
+            {
+            case ECGpuQueueType_Graphics:
+                queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT; break;
+            case ECGpuQueueType_Compute:
+                queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE; break;
+            case ECGpuQueueType_Transfer:
+                queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY; break;                
+            default:
+                assert(0 && "[D3D12 Fatal]: Unsupported ECGpuQueueType!"); return CGPU_NULLPTR;
+            }
+            queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+            if(!SUCCEEDED(cgpuD3D12Device->pDxDevice->CreateCommandQueue(&queueDesc,
+                IID_PPV_ARGS(&cgpuD3D12Device->ppCommandQueues[queueType][j]))))
+            {
+                assert("[D3D12 Fatal]: Create D3D12CommandQueue Failed!");
+            }
+        }
+    }
+    return &cgpuD3D12Device->super;
+}
+
+void cgpu_destroy_device_d3d12(CGpuDeviceId device)
+{
+    CGpuDevice_D3D12* cgpuD3D12Device = (CGpuDevice_D3D12*)device;
+    for(uint32_t t = 0u; t < ECGpuQueueType_Count; t++)
+    {
+        for(uint32_t i = 0; i < cgpuD3D12Device->pCommandQueueCounts[t]; i++)
+        {
+            cgpuD3D12Device->ppCommandQueues[t][i]->Release();
+        }
+    }
+    cgpuD3D12Device->pDxDevice->Release();
+}
+
 #include "cgpu/backend/d3d12/cgpu_d3d12_exts.h"
 // extentions
 CGpuDREDSettingsId cgpu_d3d12_enable_DRED()

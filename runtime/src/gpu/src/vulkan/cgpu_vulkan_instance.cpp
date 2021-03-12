@@ -30,12 +30,14 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     return VK_FALSE;
 }
 
-CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, CGpuVulkanInstanceDescriptor const* exts_desc)
+CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc,
+	CGpuVulkanInstanceDescriptor const* exts_desc)
 {	
 	static auto volkInit = volkInitialize();
 	assert((volkInit == VK_SUCCESS) && "Volk Initialize Failed!");
 
 	CGpuInstance_Vulkan* result = (CGpuInstance_Vulkan*)malloc(sizeof(CGpuInstance_Vulkan));
+	::memset(result, 0, sizeof(CGpuInstance_Vulkan));
     VkApplicationInfo appInfo = {};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "CGPU";
@@ -110,7 +112,6 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, C
 	// Load Vulkan instance functions
 	volkLoadInstance(result->mVkInstance);
 #endif
-
 	// enum physical devices & store informations.
 	vkEnumeratePhysicalDevices(result->mVkInstance, &result->mPhysicalDeviceCount, CGPU_NULLPTR);
 	if(result->mPhysicalDeviceCount != 0)
@@ -121,19 +122,37 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, C
 		for(uint32_t i = 0; i < result->mPhysicalDeviceCount; i++)
 		{
 			auto& VkAdapter = result->pVulkanAdapters[i];
+			for(uint32_t q = 0; q < ECGpuQueueType_Count; q++)
+			{
+				VkAdapter.mQueueFamilyIndices[q] = -1;
+			}
 			VkAdapter.super.instance = &result->super;
 			VkAdapter.mPhysicalDevice = pysicalDevices[i];
 			vkGetPhysicalDeviceProperties(pysicalDevices[i], &VkAdapter.mPhysicalDeviceProps);
 			vkGetPhysicalDeviceFeatures(pysicalDevices[i], &VkAdapter.mPhysicalDeviceFeatures);
 
 			// Query Queue Information.
-			uint32_t queueFamilyCount = 0;
 			vkGetPhysicalDeviceQueueFamilyProperties(pysicalDevices[i],
 				&VkAdapter.mQueueFamilyPropertiesCount, nullptr);
 			VkAdapter.pQueueFamilyProperties = (VkQueueFamilyProperties*)malloc(
 				sizeof(VkQueueFamilyProperties) * VkAdapter.mQueueFamilyPropertiesCount);
 			vkGetPhysicalDeviceQueueFamilyProperties(pysicalDevices[i],
 				&VkAdapter.mQueueFamilyPropertiesCount, VkAdapter.pQueueFamilyProperties);
+			// 
+			for(uint32_t j = 0; j < VkAdapter.mQueueFamilyPropertiesCount; j++)
+			{
+				const VkQueueFamilyProperties& prop =  VkAdapter.pQueueFamilyProperties[j];
+				if(prop.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+					assert(VkAdapter.mQueueFamilyIndices[ECGpuQueueType_Graphics] == -1 && "???");
+					VkAdapter.mQueueFamilyIndices[ECGpuQueueType_Graphics] = j;
+				} else if(prop.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+					assert(VkAdapter.mQueueFamilyIndices[ECGpuQueueType_Compute] == -1 && "???");
+					VkAdapter.mQueueFamilyIndices[ECGpuQueueType_Compute] = j;
+				} else if(prop.queueFlags & VK_QUEUE_TRANSFER_BIT) {
+					assert(VkAdapter.mQueueFamilyIndices[ECGpuQueueType_Transfer] == -1 && "???");
+					VkAdapter.mQueueFamilyIndices[ECGpuQueueType_Transfer] = j;
+				}
+			}
 		}
 		free(pysicalDevices);
 	} else {
@@ -174,10 +193,75 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc, C
 void cgpu_destroy_instance_vulkan(CGpuInstanceId instance)
 {
     CGpuInstance_Vulkan* to_destroy = (CGpuInstance_Vulkan*)instance;
-    vkDestroyInstance(to_destroy->mVkInstance, VK_NULL_HANDLE);
+	if(to_destroy->pVkDebugUtilsMessenger) {
+		assert(vkDestroyDebugUtilsMessengerEXT && "Load vkDestroyDebugUtilsMessengerEXT failed!");
+		vkDestroyDebugUtilsMessengerEXT(to_destroy->mVkInstance, to_destroy->pVkDebugUtilsMessenger, nullptr);
+	}
+
+	vkDestroyInstance(to_destroy->mVkInstance, VK_NULL_HANDLE);
 	free(to_destroy->pVulkanAdapters);
 	free(to_destroy);
 }
 
+const float queuePriorities[] = {
+	1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,
+	1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,
+	1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,
+	1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,
+};
+
+CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc)
+{
+	CGpuInstance_Vulkan* vkInstance = (CGpuInstance_Vulkan*)adapter->instance;
+	CGpuDevice_Vulkan* vkDevice = (CGpuDevice_Vulkan*)malloc(sizeof(CGpuDevice_Vulkan));
+	CGpuAdapter_Vulkan* a = (CGpuAdapter_Vulkan*)adapter;
+
+	*const_cast<CGpuAdapterId*>(&vkDevice->super.adapter) = adapter;
+	
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	queueCreateInfos.resize(desc->queueGroupCount);
+	for(uint32_t i = 0; i < desc->queueGroupCount; i++)
+	{
+		VkDeviceQueueCreateInfo& info = queueCreateInfos[i];
+		CGpuQueueGroupDescriptor& descriptor = desc->queueGroups[i];
+		info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		info.queueCount = descriptor.queueCount;
+		info.queueFamilyIndex = a->mQueueFamilyIndices[descriptor.queueType];
+        info.pQueuePriorities = queuePriorities;
+
+		assert(cgpu_query_queue_count_vulkan(adapter, descriptor.queueType) >= descriptor.queueCount 
+			&& "allocated too many queues!");
+	}
+
+	VkPhysicalDeviceFeatures deviceFeatures{};
+	VkDeviceCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	createInfo.pQueueCreateInfos = queueCreateInfos.data();
+	createInfo.queueCreateInfoCount = queueCreateInfos.size();
+	createInfo.pEnabledFeatures = &deviceFeatures;
+	createInfo.enabledExtensionCount = 0;
+
+	if (vkInstance->pVkDebugUtilsMessenger) {
+		createInfo.enabledLayerCount = 1;
+		createInfo.ppEnabledLayerNames = &validation_layer_name;
+	} else {
+		createInfo.enabledLayerCount = 0;
+	}
+
+	if (vkCreateDevice(a->mPhysicalDevice, &createInfo, nullptr, &vkDevice->pVkDevice) != VK_SUCCESS) {
+		assert("failed to create logical device!");
+	}
+
+	// Single Device Only.
+	volkLoadDevice(vkDevice->pVkDevice);
+
+	return &vkDevice->super;
+}
+
+void cgpu_destroy_device_vulkan(CGpuDeviceId device)
+{
+	CGpuDevice_Vulkan* vkDevice = (CGpuDevice_Vulkan*)device;
+	vkDestroyDevice(vkDevice->pVkDevice, nullptr);
+}
 
 #endif

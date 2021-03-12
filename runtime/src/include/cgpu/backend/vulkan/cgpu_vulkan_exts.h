@@ -16,9 +16,6 @@ typedef struct CGpuVulkanInstanceDescriptor {
 	uint32_t                     mInstanceLayerCount;
 	uint32_t                     mInstanceExtensionCount;
 	uint32_t                     mDeviceExtensionCount;
-	/// Flag to specify whether to request all queues from the gpu or just one of each type
-	/// This will affect memory usage - Around 200 MB more used if all queues are requested
-	bool                         mRequestAllAvailableQueues;
 	const VkDebugUtilsMessengerCreateInfoEXT* pDebugUtilsMessenger;
 } CGpuVulkanInstanceDescriptor;
 
