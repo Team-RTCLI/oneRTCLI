@@ -43,8 +43,8 @@ protected:
 
     void TearDown() override
     {
-        cgpu_destroy_device(device);
-        cgpu_destroy_instance(instance);
+        cgpu_free_device(device);
+        cgpu_free_instance(instance);
     }
 
     CGpuInstanceId instance;

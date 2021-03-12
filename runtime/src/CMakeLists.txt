@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(RTCLI)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(cmake/platform.cmake)
 include(cmake/vulkan.cmake)
 

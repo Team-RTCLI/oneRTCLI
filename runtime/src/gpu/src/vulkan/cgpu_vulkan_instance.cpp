@@ -192,7 +192,7 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc,
 	return &(result->super);
 }
 
-void cgpu_destroy_instance_vulkan(CGpuInstanceId instance)
+void cgpu_free_instance_vulkan(CGpuInstanceId instance)
 {
     CGpuInstance_Vulkan* to_destroy = (CGpuInstance_Vulkan*)instance;
 	if(to_destroy->pVkDebugUtilsMessenger) {
@@ -260,7 +260,7 @@ CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDe
 	return &vkDevice->super;
 }
 
-void cgpu_destroy_device_vulkan(CGpuDeviceId device)
+void cgpu_free_device_vulkan(CGpuDeviceId device)
 {
 	CGpuDevice_Vulkan* vkDevice = (CGpuDevice_Vulkan*)device;
 	vkDestroyDevice(vkDevice->pVkDevice, nullptr);

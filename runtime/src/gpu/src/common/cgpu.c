@@ -45,12 +45,12 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
     return instance;
 }
 
-void cgpu_destroy_instance(CGpuInstanceId instance)
+void cgpu_free_instance(CGpuInstanceId instance)
 {
     assert(instance != CGPU_NULLPTR && "fatal: can't destroy NULL instance!");
-    assert(instance->proc_table->enum_adapters && "destroy_instance Proc Missing!");
+    assert(instance->proc_table->enum_adapters && "free_instance Proc Missing!");
 
-    instance->proc_table->destroy_instance(instance);
+    instance->proc_table->free_instance(instance);
 }
 
 void cgpu_enum_adapters(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num)
@@ -88,14 +88,14 @@ CGpuDeviceId cgpu_create_device(CGpuAdapterId adapter, const CGpuDeviceDescripto
     return adapter->instance->proc_table->create_device(adapter, desc);
 }
 
-void cgpu_destroy_device(CGpuDeviceId device)
+void cgpu_free_device(CGpuDeviceId device)
 {
     assert(device != CGPU_NULLPTR && "fatal: call on NULL device!");
     assert(device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
     assert(device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
-    assert(device->adapter->instance->proc_table->destroy_device && "destroy_device Proc Missing!");
+    assert(device->adapter->instance->proc_table->free_device && "free_device Proc Missing!");
 
-    return device->adapter->instance->proc_table->destroy_device(device);
+    return device->adapter->instance->proc_table->free_device(device);
 }
 
 CGpuQueueId cgpu_get_queue(CGpuDeviceId device, ECGpuQueueType type, uint32_t index)
@@ -103,7 +103,7 @@ CGpuQueueId cgpu_get_queue(CGpuDeviceId device, ECGpuQueueType type, uint32_t in
     assert(device != CGPU_NULLPTR && "fatal: call on NULL device!");
     assert(device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
     assert(device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
-    assert(device->adapter->instance->proc_table->destroy_device && "destroy_device Proc Missing!");
+    assert(device->adapter->instance->proc_table->free_device && "free_device Proc Missing!");
 
     CGpuQueueId queue = device->adapter->instance->proc_table->get_queue(device, type, index);
     queue->index = index; queue->type = type; queue->device = device;
@@ -116,7 +116,7 @@ void cgpu_free_queue(CGpuQueueId queue)
     assert(queue->device != CGPU_NULLPTR && "fatal: call on NULL device!");
     assert(queue->device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
     assert(queue->device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
-    assert(queue->device->adapter->instance->proc_table->destroy_device && "destroy_device Proc Missing!");
+    assert(queue->device->adapter->instance->proc_table->free_device && "free_device Proc Missing!");
 
     return queue->device->adapter->instance->proc_table->free_queue(queue);
 }

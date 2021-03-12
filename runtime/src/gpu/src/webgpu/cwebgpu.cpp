@@ -76,7 +76,7 @@ CGpuInstanceId cgpu_create_instance_webgpu(CGpuInstanceDescriptor const* descrip
     return &dawn_instance->super;
 }
  
-void cgpu_destroy_instance_webgpu(CGpuInstanceId instance)
+void cgpu_free_instance_webgpu(CGpuInstanceId instance)
 {
     GpuInstanceDawn* dawn_instance = (GpuInstanceDawn*)instance;
     delete dawn_instance;
@@ -156,7 +156,7 @@ uint32_t cgpu_query_queue_count_webgpu(const CGpuAdapterId adapter, const ECGpuQ
     return UINT32_MAX;
 }
 
-void cgpu_destroy_device_webgpu(CGpuDeviceId device)
+void cgpu_free_device_webgpu(CGpuDeviceId device)
 {
     CGpuDevice_WebGpu* toDestroy = (CGpuDevice_WebGpu*)device;
     delete toDestroy;

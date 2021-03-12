@@ -33,7 +33,7 @@ int enum_adapters(CGpuInstanceId instance)
         std::cout << "device id: " << prop.deviceId << "  vendor id: " << prop.vendorId << "\n";
         std::cout << "    name: " << prop.name << "\n";
     }
-    //cgpu_destroy_instance(instance);
+    //cgpu_free_instance(instance);
     return adapters_count;
 }
 
@@ -61,7 +61,7 @@ void test_create_device(CGpuInstanceId instance, bool enableDebugLayer, bool ena
         auto device = cgpu_create_device(adapter, &descriptor);
         EXPECT_NE(device, nullptr);
         EXPECT_NE(device, CGPU_NULLPTR);
-        cgpu_destroy_device(device);
+        cgpu_free_device(device);
     }
 }
 
@@ -70,21 +70,21 @@ TEST_P(CGpuTest, InstanceCreationDbgGpu)
     ECGPUBackEnd backend = GetParam();
     auto inst = init_instance(backend, true, true);
     EXPECT_NE(inst, CGPU_NULLPTR);
-    cgpu_destroy_instance(inst);
+    cgpu_free_instance(inst);
 }
 TEST_P(CGpuTest, InstanceCreationDbg)
 {
     ECGPUBackEnd backend = GetParam();
     auto inst = init_instance(backend, true, false);
     EXPECT_NE(inst, CGPU_NULLPTR);
-    cgpu_destroy_instance(inst);
+    cgpu_free_instance(inst);
 }
 TEST_P(CGpuTest, InstanceCreation)
 {
     ECGPUBackEnd backend = GetParam();
     auto inst = init_instance(backend, false, false);
     EXPECT_NE(inst, CGPU_NULLPTR);
-    cgpu_destroy_instance(inst);
+    cgpu_free_instance(inst);
 }
 
 TEST_P(CGpuTest, AdapterEnum)
@@ -92,7 +92,7 @@ TEST_P(CGpuTest, AdapterEnum)
     ECGPUBackEnd backend = GetParam();
     auto instance = init_instance(backend, true, true);
     EXPECT_GT(enum_adapters(instance), 0);
-    cgpu_destroy_instance(instance);
+    cgpu_free_instance(instance);
 }
 
 TEST_P(CGpuTest, CreateDevice)
@@ -101,7 +101,7 @@ TEST_P(CGpuTest, CreateDevice)
     auto inst = init_instance(backend, false, false);
     EXPECT_NE(inst, CGPU_NULLPTR);
     test_create_device(inst, false, false);
-    cgpu_destroy_instance(inst);
+    cgpu_free_instance(inst);
 }
 TEST_P(CGpuTest, CreateDeviceDbg)
 {
@@ -109,7 +109,7 @@ TEST_P(CGpuTest, CreateDeviceDbg)
     auto inst = init_instance(backend, true, false);
     EXPECT_NE(inst, CGPU_NULLPTR);
     test_create_device(inst, false, false);
-    cgpu_destroy_instance(inst);
+    cgpu_free_instance(inst);
 }
 TEST_P(CGpuTest, CreateDeviceDbgGpu)
 {
@@ -117,7 +117,7 @@ TEST_P(CGpuTest, CreateDeviceDbgGpu)
     auto inst = init_instance(backend, true, true);
     EXPECT_NE(inst, CGPU_NULLPTR);
     test_create_device(inst, false, false);
-    cgpu_destroy_instance(inst);
+    cgpu_free_instance(inst);
 }
 
 TEST_P(CGpuTest, QueryQueueCount)
@@ -140,7 +140,7 @@ TEST_P(CGpuTest, QueryQueueCount)
             << "ComputeQueue: " << cQueue << "  "
             << "TransferQueue: " << tQueue << std::endl;
     }
-    cgpu_destroy_instance(instance);
+    cgpu_free_instance(instance);
 }
 
 static const auto allPlatforms = testing::Values(

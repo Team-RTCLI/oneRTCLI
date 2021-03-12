@@ -154,7 +154,7 @@ CGpuInstanceId cgpu_create_instance_d3d12(CGpuInstanceDescriptor const* descript
     return &result->super;
 }
 
-void cgpu_destroy_instance_d3d12(CGpuInstanceId instance)
+void cgpu_free_instance_d3d12(CGpuInstanceId instance)
 {
     CGpuInstance_D3D12* result = (CGpuInstance_D3D12*)instance;
     if(result->mAdaptersCount > 0)
@@ -271,7 +271,7 @@ CGpuDeviceId cgpu_create_device_d3d12(CGpuAdapterId adapter, const CGpuDeviceDes
     return &cgpuD3D12Device->super;
 }
 
-void cgpu_destroy_device_d3d12(CGpuDeviceId device)
+void cgpu_free_device_d3d12(CGpuDeviceId device)
 {
     CGpuDevice_D3D12* cgpuD3D12Device = (CGpuDevice_D3D12*)device;
     for(uint32_t t = 0u; t < ECGpuQueueType_Count; t++)

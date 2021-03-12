@@ -84,38 +84,49 @@ typedef struct CGpuDevice {
 typedef CGpuDevice* CGpuDeviceId;
 
 typedef struct CGpuQueue {
-    CGpuDeviceId device;    
+    CGpuDeviceId   device;    
     ECGpuQueueType type; 
     CGpuQueueIndex index;
 } CGpuQueue;
 typedef CGpuQueue* CGpuQueueId;
 
+typedef struct CGpuCommandPool {
+    CGpuQueueId queue;
+} CGpuCommandPool;
+typedef CGpuCommandPool* CGpuCommandPoolId;
+
+typedef struct CGpuCommandPoolDescriptor {
+    bool transient;
+} CGpuCommandPoolDescriptor;
+
 CGPU_API CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc);
 typedef CGpuInstanceId (*CGPUProcCreateInstance)(const CGpuInstanceDescriptor * descriptor);
-
-CGPU_API void cgpu_destroy_instance(CGpuInstanceId instance);
-typedef void (*CGPUProcDestroyInstance)(CGpuInstanceId instance);
+CGPU_API void cgpu_free_instance(CGpuInstanceId instance);
+typedef void (*CGPUProcFreeInstance)(CGpuInstanceId instance);
 
 CGPU_API void cgpu_enum_adapters(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 typedef void (*CGPUProcEnumAdapters)(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 
 CGPU_API CGpuAdapterDetail cgpu_query_adapter_detail(const CGpuAdapterId adapter);
 typedef CGpuAdapterDetail (*CGPUProcQueryAdapterDetail)(const CGpuAdapterId instance);
-
 CGPU_API uint32_t cgpu_query_queue_count(const CGpuAdapterId adapter, const ECGpuQueueType type);
 typedef uint32_t (*CGPUProcQueryQueueCount)(const CGpuAdapterId adapter, const ECGpuQueueType type);
 
 CGPU_API CGpuDeviceId cgpu_create_device(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
 typedef CGpuDeviceId (*CGPUProcCreateDevice)(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
-
-CGPU_API void cgpu_destroy_device(CGpuDeviceId device);
-typedef void (*CGPUProcDestroyDevice)(CGpuDeviceId device);
+CGPU_API void cgpu_free_device(CGpuDeviceId device);
+typedef void (*CGPUProcFreeDevice)(CGpuDeviceId device);
 
 CGPU_API CGpuQueueId cgpu_get_queue(CGpuDeviceId device, ECGpuQueueType type, uint32_t index);
 typedef CGpuQueueId (*CGPUProcGetQueue)(CGpuDeviceId device, ECGpuQueueType type, uint32_t index);
-
 CGPU_API void cgpu_free_queue(CGpuQueueId queue);
 typedef void (*CGPUProcFreeQueue)(CGpuQueueId queue);
+
+CGPU_API CGpuCommandPoolId cgpu_create_command_pool(CGpuQueueId queue, const CGpuCommandPoolDescriptor* desc);
+typedef void (*CGPUProcCreateCommandPool)(CGpuQueueId queue, const CGpuCommandPoolDescriptor* desc);
+CGPU_API void cgpu_free_command_pool(CGpuCommandPoolId pool);
+typedef void (*CGPUProcFreeCommandPool)(CGpuCommandPoolId pool);
+
 
 
 typedef struct CGpuBuffer {const CGpuDeviceId device;} CGpuBuffer;
@@ -124,12 +135,12 @@ typedef CGpuBuffer* CGpuBufferId;
 
 typedef struct CGpuProcTable {
     CGPUProcCreateInstance     create_instance;
-    CGPUProcDestroyInstance    destroy_instance;
+    CGPUProcFreeInstance    free_instance;
     CGPUProcEnumAdapters       enum_adapters;
     CGPUProcQueryAdapterDetail query_adapter_detail;
     CGPUProcQueryQueueCount    query_queue_count;
     CGPUProcCreateDevice       create_device;
-    CGPUProcDestroyDevice      destroy_device;
+    CGPUProcFreeDevice      free_device;
     CGPUProcGetQueue           get_queue;
     CGPUProcFreeQueue          free_queue;
 } CGpuProcTable;

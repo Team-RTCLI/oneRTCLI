@@ -10,12 +10,12 @@
 const CGpuProcTable tbl_vk = 
 {
     .create_instance = &cgpu_create_instance_vulkan,
-    .destroy_instance = &cgpu_destroy_instance_vulkan,
+    .free_instance = &cgpu_free_instance_vulkan,
 	.enum_adapters = &cgpu_enum_adapters_vulkan,
 	.query_adapter_detail = &cgpu_query_adapter_detail_vulkan,
 	.query_queue_count = &cgpu_query_queue_count_vulkan,
 	.create_device = &cgpu_create_device_vulkan,
-	.destroy_device = &cgpu_destroy_device_vulkan,
+	.free_device = &cgpu_free_device_vulkan,
 	.get_queue = &cgpu_get_queue_vulkan,
 	.free_queue = &cgpu_free_queue_vulkan
 };

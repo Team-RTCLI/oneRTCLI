@@ -11,12 +11,12 @@ extern "C" {
 const CGpuProcTable* CGPU_D3D12ProcTable();
 
 CGpuInstanceId cgpu_create_instance_d3d12(CGpuInstanceDescriptor const* descriptor);
-void cgpu_destroy_instance_d3d12(CGpuInstanceId instance);
+void cgpu_free_instance_d3d12(CGpuInstanceId instance);
 void cgpu_enum_adapters_d3d12(CGpuInstanceId instance, CGpuAdapterId* const adapters, size_t* adapters_num);
 CGpuAdapterDetail cgpu_query_adapter_detail_d3d12(const CGpuAdapterId adapter);
 uint32_t cgpu_query_queue_count_d3d12(const CGpuAdapterId adapter, const ECGpuQueueType type);
 CGpuDeviceId cgpu_create_device_d3d12(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
-void cgpu_destroy_device_d3d12(CGpuDeviceId device);
+void cgpu_free_device_d3d12(CGpuDeviceId device);
 CGpuQueueId cgpu_get_queue_d3d12(CGpuDeviceId device, ECGpuQueueType type, uint32_t index);
 void cgpu_free_queue_d3d12(CGpuQueueId queue);
 
