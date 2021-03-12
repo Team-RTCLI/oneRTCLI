@@ -1,6 +1,6 @@
 #define DLL_IMPLEMENTATION
 
-#include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
+#include "cgpu/extensions/cgpu_vulkan_exts.h"
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
 #include <cassert>
 #include <stdlib.h>

@@ -1,7 +1,7 @@
 #define DLL_IMPLEMENTATION
 
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
-#include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
+#include "cgpu/extensions/cgpu_vulkan_exts.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -170,7 +170,7 @@ void cgpu_free_command_encoder_vulkan(CGpuCommandEncoderId encoder)
 }
 
 // exts
-#include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
+#include "cgpu/extensions/cgpu_vulkan_exts.h"
 
 
 #endif

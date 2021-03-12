@@ -1,6 +1,6 @@
 #include "cgpu/api.h"
 #ifdef CGPU_USE_VULKAN
-#include "cgpu/backend/vulkan/cgpu_vulkan_exts.h"
+#include "cgpu/extensions/cgpu_vulkan_exts.h"
 #include "gtest/gtest.h"
 #include <vector>
 

@@ -1,6 +1,6 @@
 #include "cgpu/api.h"
 #ifdef CGPU_USE_D3D12
-#include "cgpu/backend/d3d12/cgpu_d3d12_exts.h"
+#include "cgpu/extensions/cgpu_d3d12_exts.h"
 #include "gtest/gtest.h"
 #include <vector>
 

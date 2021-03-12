@@ -333,7 +333,7 @@ void cgpu_free_command_encoder_d3d12(CGpuCommandEncoderId encoder)
     delete E;
 }
 
-#include "cgpu/backend/d3d12/cgpu_d3d12_exts.h"
+#include "cgpu/extensions/cgpu_d3d12_exts.h"
 // extentions
 CGpuDREDSettingsId cgpu_d3d12_enable_DRED()
 {
