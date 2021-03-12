@@ -69,9 +69,9 @@ typedef struct CGpuDeviceDescriptor {
     uint32_t                  queueGroupCount;
 } CGpuDeviceDescriptor;
 
-typedef struct CGpuCommandPoolDescriptor {
+typedef struct CGpuCommandEncoderDescriptor {
     bool transient;
-} CGpuCommandPoolDescriptor;
+} CGpuCommandEncoderDescriptor;
 
 typedef struct CGpuInstance* CGpuInstanceId;
 typedef struct CGpuAdapter {
@@ -94,13 +94,13 @@ typedef struct CGpuQueue {
 } CGpuQueue;
 typedef CGpuQueue* CGpuQueueId;
 
-typedef struct CGpuCommandPool {
+typedef struct CGpuCommandEncoder {
     CGpuQueueId queue;
-} CGpuCommandPool;
-typedef CGpuCommandPool* CGpuCommandPoolId;
+} CGpuCommandEncoder;
+typedef CGpuCommandEncoder* CGpuCommandEncoderId;
 
 typedef struct CGpuCommandBuffer {
-    CGpuCommandPoolId pool;
+    CGpuCommandEncoderId pool;
 } CGpuCommandBuffer;
 typedef CGpuCommandBuffer* CGpuCommandBufferId;
 
@@ -127,10 +127,10 @@ typedef CGpuQueueId (*CGPUProcGetQueue)(CGpuDeviceId device, ECGpuQueueType type
 CGPU_API void cgpu_free_queue(CGpuQueueId queue);
 typedef void (*CGPUProcFreeQueue)(CGpuQueueId queue);
 
-CGPU_API CGpuCommandPoolId cgpu_create_command_pool(CGpuQueueId queue, const CGpuCommandPoolDescriptor* desc);
-typedef void (*CGPUProcCreateCommandPool)(CGpuQueueId queue, const CGpuCommandPoolDescriptor* desc);
-CGPU_API void cgpu_free_command_pool(CGpuCommandPoolId pool);
-typedef void (*CGPUProcFreeCommandPool)(CGpuCommandPoolId pool);
+CGPU_API CGpuCommandEncoderId cgpu_create_command_encoder(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
+typedef void (*CGPUProcCreateCommandEncoder)(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
+CGPU_API void cgpu_free_command_encoder(CGpuCommandEncoderId pool);
+typedef void (*CGPUProcFreeCommandEncoder)(CGpuCommandEncoderId pool);
 
 
 CGPU_API void cgpu_cmd_set_viewport(CGpuCommandBufferId cmd, float x, float y, float width, float height,
@@ -159,8 +159,8 @@ typedef struct CGpuProcTable {
     CGPUProcGetQueue           get_queue;
     CGPUProcFreeQueue          free_queue;
 
-    CGPUProcCreateCommandPool  create_command_pool;
-    CGPUProcFreeCommandPool    free_command_pool;
+    CGPUProcCreateCommandEncoder  create_command_encoder;
+    CGPUProcFreeCommandEncoder    free_command_encoder;
 
     CGPUProcCmdSetViewport     cmd_set_viewport;
     CGPUProcCmdSetScissor      cmd_set_scissor;
