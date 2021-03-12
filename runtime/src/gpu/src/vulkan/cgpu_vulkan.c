@@ -23,6 +23,7 @@ const CGpuProcTable tbl_vk =
 	.free_command_encoder = &cgpu_free_command_encoder_vulkan
 };
 
+
 const CGpuProcTable* CGPU_VulkanProcTable()
 {
     return &tbl_vk;

@@ -5,6 +5,7 @@
 #endif
 #ifdef CGPU_USE_VULKAN
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
+#include "cgpu/backend/vulkan/cgpu_vulkan_surfaces.h"
 #endif
 #ifdef CGPU_USE_D3D12
 #include "cgpu/backend/d3d12/cgpu_d3d12.h"
@@ -26,6 +27,8 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
           || desc->backend == ECGPUBackEnd_D3D12) 
         && "cgpu support only webgpu & vulkan & d3d12 currently!");
     const CGpuProcTable* tbl = CGPU_NULLPTR;
+    const CGpuSurfacesProcTable* s_tbl = CGPU_NULLPTR;
+
     if(desc->backend == ECGPUBackEnd_WEBGPU)
     {
 #ifdef _MACOS 
@@ -34,14 +37,16 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
         WGPUBackendType type = WGPUBackendType_Vulkan;
 #endif
         tbl = CGPU_WebGPUProcTable(type);
-
     } else if (desc->backend == ECGPUBackEnd_VULKAN) {
         tbl = CGPU_VulkanProcTable();
+        s_tbl = CGPU_VulkanSurfacesProcTable();
     } else if (desc->backend == ECGPUBackEnd_D3D12) {
         tbl = CGPU_D3D12ProcTable();
     }
+
     CGpuInstanceId instance = tbl->create_instance(desc);
     instance->proc_table = tbl;
+    instance->surfaces_table = s_tbl;
     return instance;
 }
 

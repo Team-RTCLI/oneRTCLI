@@ -76,6 +76,7 @@ typedef struct CGpuCommandEncoderDescriptor {
 typedef struct CGpuSurface {
     void* ptr;
 } CGpuSurface;
+typedef CGpuSurface* CGpuSurfaceId;
 
 typedef struct CGpuSwapChainDescriptor {
     CGpuSurface surface;
@@ -190,15 +191,19 @@ typedef struct CGpuProcTable {
 } CGpuProcTable;
 
 // surfaces
+CGPU_API void cgpu_surface_free(CGpuSurfaceId surface);
+typedef void (*CGPUSurfaceProc_Free)(CGpuSurfaceId surface);
+
 #if defined(_WIN32) || defined(_WIN64)
-typedef CGpuSurface (*CGPUSurfaceProc_CreateFromHWND)(HWND window);
-CGPU_API CGpuSurface cgpu_surface_from_hwnd(HWND window);
+CGPU_API CGpuSurfaceId cgpu_surface_from_hwnd(HWND window);
+typedef CGpuSurfaceId (*CGPUSurfaceProc_CreateFromHWND)(HWND window);
 #endif
 #ifdef __APPLE__
-typedef CGpuSurface (*CGPUSurfaceProc_CreateFromUIView)(UIView* window);
-typedef CGpuSurface (*CGPUSurfaceProc_CreateFromNSView)(NSView* window);
-CGPU_API CGpuSurface cgpu_surface_from_ui_view(UIView* window);
-CGPU_API CGpuSurface cgpu_surface_from_ns_view(NSView* window);
+CGPU_API CGpuSurfaceId cgpu_surface_from_ui_view(UIView* window);
+typedef CGpuSurfaceId (*CGPUSurfaceProc_CreateFromUIView)(UIView* window);
+
+CGPU_API CGpuSurfaceId cgpu_surface_from_ns_view(NSView* window);
+typedef CGpuSurfaceId (*CGPUSurfaceProc_CreateFromNSView)(NSView* window);
 #endif
 typedef struct CGpuSurfacesProcTable {
 #if defined(_WIN32) || defined(_WIN64)
