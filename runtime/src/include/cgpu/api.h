@@ -69,6 +69,10 @@ typedef struct CGpuDeviceDescriptor {
     uint32_t                  queueGroupCount;
 } CGpuDeviceDescriptor;
 
+typedef struct CGpuCommandPoolDescriptor {
+    bool transient;
+} CGpuCommandPoolDescriptor;
+
 typedef struct CGpuInstance* CGpuInstanceId;
 typedef struct CGpuAdapter {
     const struct CGpuInstance* instance;
@@ -95,9 +99,10 @@ typedef struct CGpuCommandPool {
 } CGpuCommandPool;
 typedef CGpuCommandPool* CGpuCommandPoolId;
 
-typedef struct CGpuCommandPoolDescriptor {
-    bool transient;
-} CGpuCommandPoolDescriptor;
+typedef struct CGpuCommandBuffer {
+    CGpuCommandPoolId pool;
+} CGpuCommandBuffer;
+typedef CGpuCommandBuffer* CGpuCommandBufferId;
 
 CGPU_API CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc);
 typedef CGpuInstanceId (*CGPUProcCreateInstance)(const CGpuInstanceDescriptor * descriptor);
@@ -128,6 +133,13 @@ CGPU_API void cgpu_free_command_pool(CGpuCommandPoolId pool);
 typedef void (*CGPUProcFreeCommandPool)(CGpuCommandPoolId pool);
 
 
+CGPU_API void cgpu_cmd_set_viewport(CGpuCommandBufferId cmd, float x, float y, float width, float height,
+    float min_depth, float max_depth);
+typedef void (*CGPUProcCmdSetViewport)(CGpuCommandBufferId cmd, float x, float y, float width, float height,
+    float min_depth, float max_depth);
+
+CGPU_API void cgpu_cmd_set_scissor(CGpuCommandBufferId cmd, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+typedef void (*CGPUProcCmdSetScissor)(CGpuCommandBufferId cmd, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 
 typedef struct CGpuBuffer {const CGpuDeviceId device;} CGpuBuffer;
 typedef CGpuBuffer* CGpuBufferId;
@@ -135,14 +147,23 @@ typedef CGpuBuffer* CGpuBufferId;
 
 typedef struct CGpuProcTable {
     CGPUProcCreateInstance     create_instance;
-    CGPUProcFreeInstance    free_instance;
+    CGPUProcFreeInstance       free_instance;
+
     CGPUProcEnumAdapters       enum_adapters;
     CGPUProcQueryAdapterDetail query_adapter_detail;
     CGPUProcQueryQueueCount    query_queue_count;
+
     CGPUProcCreateDevice       create_device;
-    CGPUProcFreeDevice      free_device;
+    CGPUProcFreeDevice         free_device;
+    
     CGPUProcGetQueue           get_queue;
     CGPUProcFreeQueue          free_queue;
+
+    CGPUProcCreateCommandPool  create_command_pool;
+    CGPUProcFreeCommandPool    free_command_pool;
+
+    CGPUProcCmdSetViewport     cmd_set_viewport;
+    CGPUProcCmdSetScissor      cmd_set_scissor;
 } CGpuProcTable;
 
 typedef struct CGpuInstance {
