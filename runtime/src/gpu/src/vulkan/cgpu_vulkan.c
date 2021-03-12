@@ -15,7 +15,9 @@ const CGpuProcTable tbl_vk =
 	.query_adapter_detail = &cgpu_query_adapter_detail_vulkan,
 	.query_queue_count = &cgpu_query_queue_count_vulkan,
 	.create_device = &cgpu_create_device_vulkan,
-	.destroy_device = &cgpu_destroy_device_vulkan
+	.destroy_device = &cgpu_destroy_device_vulkan,
+	.get_queue = &cgpu_get_queue_vulkan,
+	.free_queue = &cgpu_free_queue_vulkan
 };
 
 const CGpuProcTable* CGPU_VulkanProcTable()
@@ -98,6 +100,22 @@ uint32_t cgpu_query_queue_count_vulkan(const CGpuAdapterId adapter, const ECGpuQ
 		default: assert(0 && "CGPU VULKAN: ERROR Queue Type!");
 	}
 	return count;
+}
+
+CGpuQueueId cgpu_get_queue_vulkan(CGpuDeviceId device, ECGpuQueueType type, uint32_t index)
+{
+	assert(device && "CGPU VULKAN: NULL DEVICE!");
+	CGpuDevice_Vulkan* D = (CGpuDevice_Vulkan*)device;
+	CGpuAdapter_Vulkan* A = (CGpuAdapter_Vulkan*)device->adapter;
+	CGpuQueue_Vulkan* Q = (CGpuQueue_Vulkan*)malloc(sizeof(CGpuQueue_Vulkan));
+
+	D->mVkDeviceTable.vkGetDeviceQueue(D->pVkDevice, A->mQueueFamilyIndices[type], index, &Q->pVkQueue);
+	return &Q->super;
+}
+
+void cgpu_free_queue_vulkan(CGpuQueueId queue)
+{
+	free(queue);
 }
 
 // exts

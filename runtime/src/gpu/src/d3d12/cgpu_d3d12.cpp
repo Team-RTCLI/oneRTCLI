@@ -284,6 +284,22 @@ void cgpu_destroy_device_d3d12(CGpuDeviceId device)
     cgpuD3D12Device->pDxDevice->Release();
 }
 
+CGpuQueueId cgpu_get_queue_d3d12(CGpuDeviceId device, ECGpuQueueType type, uint32_t index)
+{
+    CGpuDevice_D3D12* D = (CGpuDevice_D3D12*)device;
+    CGpuQueue_D3D12* Q = new CGpuQueue_D3D12();
+    Q->pCommandQueue = D->ppCommandQueues[type][index];
+    return &Q->super;
+}
+
+void cgpu_free_queue_d3d12(CGpuQueueId queue)
+{
+    CGpuQueue_D3D12* Q = (CGpuQueue_D3D12*)queue;
+    assert(queue && "ERROR: Destroy NULL QUEUE!");
+
+    delete Q;
+}
+
 #include "cgpu/backend/d3d12/cgpu_d3d12_exts.h"
 // extentions
 CGpuDREDSettingsId cgpu_d3d12_enable_DRED()

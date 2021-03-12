@@ -10,7 +10,9 @@ const CGpuProcTable tbl_d3d12 =
 	.query_adapter_detail = &cgpu_query_adapter_detail_d3d12,
     .query_queue_count = &cgpu_query_queue_count_d3d12,
     .create_device = &cgpu_create_device_d3d12,
-    .destroy_device = &cgpu_destroy_device_d3d12
+    .destroy_device = &cgpu_destroy_device_d3d12,
+    .get_queue = &cgpu_get_queue_d3d12,
+    .free_queue = &cgpu_free_queue_d3d12
 };
 
 const CGpuProcTable* CGPU_D3D12ProcTable()

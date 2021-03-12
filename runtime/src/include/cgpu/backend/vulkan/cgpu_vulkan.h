@@ -15,6 +15,8 @@ CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter);
 uint32_t cgpu_query_queue_count_vulkan(const CGpuAdapterId adapter, const ECGpuQueueType type);
 CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc);
 void cgpu_destroy_device_vulkan(CGpuDeviceId device);
+CGpuQueueId cgpu_get_queue_vulkan(CGpuDeviceId device, ECGpuQueueType type, uint32_t index);
+void cgpu_free_queue_vulkan(CGpuQueueId queue);
 
 typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;
@@ -39,6 +41,11 @@ typedef struct CGpuDevice_Vulkan {
     VkDevice pVkDevice;
     struct VolkDeviceTable mVkDeviceTable;
 } CGpuDevice_Vulkan;
+
+typedef struct CGpuQueue_Vulkan {
+    CGpuQueue super;
+    VkQueue pVkQueue;
+} CGpuQueue_Vulkan;
 
 #ifdef __cplusplus
 } // end extern "C"
