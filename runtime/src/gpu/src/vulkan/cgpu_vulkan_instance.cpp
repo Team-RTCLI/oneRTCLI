@@ -103,24 +103,24 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc,
 	}
 	createInfo.enabledLayerCount = layers.size();
 	createInfo.ppEnabledLayerNames = layers.data();
-	if (vkCreateInstance(&createInfo, VK_NULL_HANDLE, &result->mVkInstance) != VK_SUCCESS)
+	if (vkCreateInstance(&createInfo, VK_NULL_HANDLE, &result->pVkInstance) != VK_SUCCESS)
 	{
 		assert(0 && "Vulkan: failed to create instance!");
 	}
 
 #if defined(NX64)
-	loadExtensionsNX(result->mVkInstance);
+	loadExtensionsNX(result->pVkInstance);
 #else
 	// Load Vulkan instance functions
-	volkLoadInstance(result->mVkInstance);
+	volkLoadInstance(result->pVkInstance);
 #endif
 	// enum physical devices & store informations.
-	vkEnumeratePhysicalDevices(result->mVkInstance, &result->mPhysicalDeviceCount, CGPU_NULLPTR);
+	vkEnumeratePhysicalDevices(result->pVkInstance, &result->mPhysicalDeviceCount, CGPU_NULLPTR);
 	if(result->mPhysicalDeviceCount != 0)
 	{
 		result->pVulkanAdapters = (CGpuAdapter_Vulkan*)malloc(sizeof(CGpuAdapter_Vulkan) * result->mPhysicalDeviceCount);
 		VkPhysicalDevice* pysicalDevices = (VkPhysicalDevice*)malloc(sizeof(VkPhysicalDevice) * result->mPhysicalDeviceCount);
-		vkEnumeratePhysicalDevices(result->mVkInstance, &result->mPhysicalDeviceCount, pysicalDevices);
+		vkEnumeratePhysicalDevices(result->pVkInstance, &result->mPhysicalDeviceCount, pysicalDevices);
 		for(uint32_t i = 0; i < result->mPhysicalDeviceCount; i++)
 		{
 			auto& VkAdapter = result->pVulkanAdapters[i];
@@ -181,7 +181,7 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc,
             messengerInfoPtr = &messengerInfo;
         }
 		assert(vkCreateDebugUtilsMessengerEXT && "Load vkCreateDebugUtilsMessengerEXT failed!");
-        VkResult res = vkCreateDebugUtilsMessengerEXT(result->mVkInstance,
+        VkResult res = vkCreateDebugUtilsMessengerEXT(result->pVkInstance,
             messengerInfoPtr, nullptr, &(result->pVkDebugUtilsMessenger));
         if (VK_SUCCESS != res)
         {
@@ -197,10 +197,10 @@ void cgpu_free_instance_vulkan(CGpuInstanceId instance)
     CGpuInstance_Vulkan* to_destroy = (CGpuInstance_Vulkan*)instance;
 	if(to_destroy->pVkDebugUtilsMessenger) {
 		assert(vkDestroyDebugUtilsMessengerEXT && "Load vkDestroyDebugUtilsMessengerEXT failed!");
-		vkDestroyDebugUtilsMessengerEXT(to_destroy->mVkInstance, to_destroy->pVkDebugUtilsMessenger, nullptr);
+		vkDestroyDebugUtilsMessengerEXT(to_destroy->pVkInstance, to_destroy->pVkDebugUtilsMessenger, nullptr);
 	}
 
-	vkDestroyInstance(to_destroy->mVkInstance, VK_NULL_HANDLE);
+	vkDestroyInstance(to_destroy->pVkInstance, VK_NULL_HANDLE);
 	free(to_destroy->pVulkanAdapters);
 	free(to_destroy);
 }

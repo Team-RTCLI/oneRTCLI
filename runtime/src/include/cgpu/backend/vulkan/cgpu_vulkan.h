@@ -1,10 +1,15 @@
 #pragma once
 #include "cgpu/api.h"
+#if defined(_WIN32) || defined(_WIN64)
+#define VK_USE_PLATFORM_WIN32_KHR
+#endif
 #include "volk.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define GLOBAL_VkAllocationCallbacks CGPU_NULLPTR
 
 #ifndef VK_USE_VOLK_DEVICE_TABLE
 #define VK_USE_VOLK_DEVICE_TABLE
@@ -26,7 +31,7 @@ void cgpu_free_command_encoder_vulkan(CGpuCommandEncoderId pool);
 
 typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;
-    VkInstance mVkInstance;
+    VkInstance pVkInstance;
     VkDebugUtilsMessengerEXT pVkDebugUtilsMessenger;
     struct CGpuAdapter_Vulkan* pVulkanAdapters;
     uint32_t mPhysicalDeviceCount;

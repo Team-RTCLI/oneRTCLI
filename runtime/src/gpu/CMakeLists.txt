@@ -38,8 +38,7 @@ target_link_directories(CGPU
 set(DAWN_COMPS dawn_native dawn_platform dawn_proc)
 target_link_libraries(CGPU
     PUBLIC
-    ${DAWN_COMPS} 
-    #${Vulkan_LIBRARY} We use volk, so it's no need to link to Vulkan_LIBRARY
+    ${DAWN_COMPS} #${Vulkan_LIBRARY} 
 )
 
 if(MSVC)

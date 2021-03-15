@@ -9,6 +9,7 @@
 #endif
 #ifdef CGPU_USE_D3D12
 #include "cgpu/backend/d3d12/cgpu_d3d12.h"
+#include "cgpu/backend/d3d12/cgpu_d3d12_surfaces.h"
 #endif
 
 #ifdef __APPLE__
@@ -37,13 +38,14 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
         WGPUBackendType type = WGPUBackendType_Vulkan;
 #endif
         tbl = CGPU_WebGPUProcTable(type);
+        s_tbl = CGPU_WebGPUSurfacesProcTable();
     } else if (desc->backend == ECGPUBackEnd_VULKAN) {
         tbl = CGPU_VulkanProcTable();
         s_tbl = CGPU_VulkanSurfacesProcTable();
     } else if (desc->backend == ECGPUBackEnd_D3D12) {
         tbl = CGPU_D3D12ProcTable();
+        s_tbl = CGPU_D3D12SurfacesProcTable();
     }
-
     CGpuInstanceId instance = tbl->create_instance(desc);
     instance->proc_table = tbl;
     instance->surfaces_table = s_tbl;
@@ -151,3 +153,16 @@ CGPU_API void cgpu_free_command_encoder(CGpuCommandEncoderId encoder)
 
     return encoder->queue->device->adapter->instance->proc_table->free_command_encoder(encoder);
 }
+
+
+// surfaces
+CGpuSurfaceId cgpu_surface_from_hwnd(CGpuInstanceId instance, HWND window)
+{
+    assert(instance != CGPU_NULLPTR && "fatal: can't destroy NULL instance!");
+    assert(instance->surfaces_table != CGPU_NULLPTR && "surfaces_table Missing!");
+    assert(instance->surfaces_table->from_hwnd != CGPU_NULLPTR && "free_instance Proc Missing!");
+
+    return instance->surfaces_table->from_hwnd(instance, window);
+}
+
+//

@@ -1,6 +1,5 @@
 #pragma once
-#include "cgpu/api.h"
-#include "volk.h"
+#include "cgpu/backend/vulkan/cgpu_vulkan.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,11 +7,10 @@ extern "C" {
 
 const CGpuSurfacesProcTable* CGPU_VulkanSurfacesProcTable();
 
-
-void cgpu_surface_free_vulkan(CGpuSurfaceId surface);
+void cgpu_surface_free_vulkan(CGpuInstanceId instance, CGpuSurfaceId surface);
 
 #if defined(_WIN32) || defined(_WIN64)
-CGpuSurfaceId cgpu_surface_from_hwnd_vulkan(HWND window);
+CGpuSurfaceId cgpu_surface_from_hwnd_vulkan(CGpuInstanceId instance, HWND window);
 #endif
 
 #ifdef __cplusplus

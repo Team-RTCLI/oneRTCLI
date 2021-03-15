@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 #ifdef CGPU_USE_VULKAN
-#define GLOBAL_VkAllocationCallbacks CGPU_NULLPTR
 
 const CGpuProcTable tbl_vk = 
 {

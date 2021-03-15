@@ -1,5 +1,5 @@
 #define DLL_IMPLEMENTATION
-
+#include <stdlib.h>
 #include "cgpu/api.h"
 #ifdef CGPU_USE_WEBGPU
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
@@ -60,7 +60,7 @@ CGpuCommandEncoderId cgpu_create_command_encoder_webgpu(CGpuQueueId queue, const
     assert(queue && "WGPU ERROR: NULL QUEUE!");
     
     CGpuCommandEncoder_WebGpu* E = (CGpuCommandEncoder_WebGpu*)malloc(sizeof(CGpuCommandEncoder_WebGpu));
-    CGpuQueue_WebGpu* Q = (CGpuQueue_WebGpu*)queue;
+    //CGpuQueue_WebGpu* Q = (CGpuQueue_WebGpu*)queue;
     CGpuDevice_WebGpu* D = (CGpuDevice_WebGpu*)queue->device;
     E->pWGPUEncoder = wgpuDeviceCreateCommandEncoder(D->pWGPUDevice, CGPU_NULLPTR);
     return &E->super;

@@ -1,5 +1,6 @@
 #define DLL_IMPLEMENTATION
 #include "cgpu/backend/d3d12/cgpu_d3d12.h"
+#include "cgpu/backend/d3d12/cgpu_d3d12_surfaces.h"
 #ifdef CGPU_USE_D3D12
 
 const CGpuProcTable tbl_d3d12 = 
@@ -20,6 +21,20 @@ const CGpuProcTable tbl_d3d12 =
 const CGpuProcTable* CGPU_D3D12ProcTable()
 {
     return &tbl_d3d12;
+}
+
+
+const CGpuSurfacesProcTable s_tbl_d3d12 = 
+{
+    .cgpu_surface_free = cgpu_surface_free_d3d12,
+#if defined(_WIN32) || defined(_WIN64)
+    .from_hwnd = cgpu_surface_from_hwnd_d3d12
+#endif
+};
+
+const CGpuSurfacesProcTable* CGPU_D3D12SurfacesProcTable()
+{
+    return &s_tbl_d3d12;
 }
 
 #endif
