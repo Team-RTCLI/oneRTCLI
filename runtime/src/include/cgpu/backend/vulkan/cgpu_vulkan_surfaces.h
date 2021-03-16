@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-const CGpuSurfacesProcTable* CGPU_VulkanSurfacesProcTable();
 
 void cgpu_free_surface_vulkan(CGpuDeviceId device, CGpuSurfaceId surface);
 

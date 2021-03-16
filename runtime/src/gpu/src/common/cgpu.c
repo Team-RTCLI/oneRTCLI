@@ -1,16 +1,12 @@
 #include "cgpu/api.h"
 #ifdef CGPU_USE_WEBGPU
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
-#include "cgpu/backend/webgpu/cgpu_webgpu_surfaces.h"
-#include "cgpu/extensions/cgpu_webgpu_exts.h"
 #endif
 #ifdef CGPU_USE_VULKAN
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
-#include "cgpu/backend/vulkan/cgpu_vulkan_surfaces.h"
 #endif
 #ifdef CGPU_USE_D3D12
 #include "cgpu/backend/d3d12/cgpu_d3d12.h"
-#include "cgpu/backend/d3d12/cgpu_d3d12_surfaces.h"
 #endif
 
 #ifdef __APPLE__

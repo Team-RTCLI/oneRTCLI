@@ -9,7 +9,6 @@
 extern "C" {
 #endif
 
-const CGpuSurfacesProcTable* CGPU_WebGPUSurfacesProcTable();
 
 void cgpu_free_surface_webgpu(CGpuDeviceId device, CGpuSurfaceId surface);
 

@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 const CGpuProcTable* CGPU_D3D12ProcTable();
+const CGpuSurfacesProcTable* CGPU_D3D12SurfacesProcTable();
 
 CGpuInstanceId cgpu_create_instance_d3d12(CGpuInstanceDescriptor const* descriptor);
 void cgpu_free_instance_d3d12(CGpuInstanceId instance);

@@ -179,9 +179,9 @@ void cgpu_free_command_encoder_vulkan(CGpuCommandEncoderId encoder)
 
 CGpuSwapChainId cgpu_create_swapchain_vulkan(CGpuDeviceId device, const CGpuSwapChainDescriptor* desc)
 {
-	CGpuDevice_Vulkan* D = (CGpuAdapter_Vulkan*)device;
+	CGpuDevice_Vulkan* D = (CGpuDevice_Vulkan*)device;
 	CGpuAdapter_Vulkan* A = (CGpuAdapter_Vulkan*)device->adapter;
-	CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)device->adapter->instance;
+	//CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)device->adapter->instance;
 	VkSurfaceKHR vkSurface = (VkSurfaceKHR)desc->surface;
 
 	VkSurfaceCapabilitiesKHR caps = {0};
@@ -298,10 +298,7 @@ CGpuSwapChainId cgpu_create_swapchain_vulkan(CGpuDeviceId device, const CGpuSwap
 
 	CGpuQueue_Vulkan* Q = (CGpuQueue_Vulkan*)desc->presentQueues[0];
 	VkSharingMode sharing_mode = VK_SHARING_MODE_EXCLUSIVE;
-	uint32_t      queue_family_index_count = 0;
-	uint32_t      queue_family_indices[2] = { Q->mVkQueueFamilyIndex, 0 };
 	uint32_t      presentQueueFamilyIndex = -1;
-
 	// Check Queue Present Support.
 	{
 		VkBool32 sup = VK_FALSE;
@@ -417,7 +414,6 @@ void cgpu_free_swapchain_vulkan(CGpuSwapChainId swapchain)
 {
 	CGpuSwapChain_Vulkan* S = (CGpuSwapChain_Vulkan*)swapchain;
 	CGpuDevice_Vulkan* D = (CGpuDevice_Vulkan*)swapchain->device;
-	CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)swapchain->device->adapter->instance;
 
 	D->mVkDeviceTable.vkDestroySwapchainKHR(D->pVkDevice, S->pVkSwapChain, GLOBAL_VkAllocationCallbacks);
 

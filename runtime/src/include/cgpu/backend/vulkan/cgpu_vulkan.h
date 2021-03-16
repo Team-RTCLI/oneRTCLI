@@ -16,6 +16,7 @@ extern "C" {
 #endif 
 
 const CGpuProcTable* CGPU_VulkanProcTable();
+const CGpuSurfacesProcTable* CGPU_VulkanSurfacesProcTable();
 
 CGpuInstanceId cgpu_create_instance_vulkan(CGpuInstanceDescriptor const* descriptor);
 void cgpu_free_instance_vulkan(CGpuInstanceId instance);

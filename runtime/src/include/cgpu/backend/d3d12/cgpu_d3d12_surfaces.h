@@ -8,7 +8,6 @@
 extern "C" {
 #endif
 
-const CGpuSurfacesProcTable* CGPU_D3D12SurfacesProcTable();
 
 void cgpu_free_surface_d3d12(CGpuDeviceId device, CGpuSurfaceId surface);
 

@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 const CGpuProcTable* CGPU_WebGPUProcTable(const enum WGPUBackendType t);
+const CGpuSurfacesProcTable* CGPU_WebGPUSurfacesProcTable();
 
 // implementations
 CGpuInstanceId cgpu_create_instance_webgpu(CGpuInstanceDescriptor const* descriptor);

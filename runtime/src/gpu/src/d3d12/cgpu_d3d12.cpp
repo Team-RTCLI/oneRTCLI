@@ -337,7 +337,7 @@ void cgpu_free_command_encoder_d3d12(CGpuCommandEncoderId encoder)
 CGpuSwapChainId cgpu_create_swapchain_d3d12(CGpuDeviceId device, const CGpuSwapChainDescriptor* desc)
 {
     CGpuInstance_D3D12* I = (CGpuInstance_D3D12*)device->adapter->instance;
-    CGpuDevice_D3D12* D = (CGpuDevice_D3D12*)device;
+    //CGpuDevice_D3D12* D = (CGpuDevice_D3D12*)device;
     CGpuSwapChain_D3D12* S = new CGpuSwapChain_D3D12();
 
     S->mDxSyncInterval = desc->enableVsync ? 1 : 0;
