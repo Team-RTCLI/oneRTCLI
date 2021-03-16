@@ -33,7 +33,7 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
 
     if (desc->backend == ECGPUBackEnd_COUNT)
     {
-        
+
     }
 #ifdef CGPU_USE_WEBGPU
     else if(desc->backend == ECGPUBackEnd_WEBGPU)
@@ -182,4 +182,14 @@ CGpuSurfaceId cgpu_surface_from_hwnd(CGpuDeviceId device, HWND window)
     return device->adapter->instance->surfaces_table->from_hwnd(device, window);
 }
 
+void cgpu_free_surface(CGpuDeviceId device, CGpuSurfaceId surface)
+{
+    assert(device != CGPU_NULLPTR && "fatal: call on NULL device!");
+    assert(device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
+    assert(device->adapter->instance != CGPU_NULLPTR && "fatal: call on NULL instnace!");
+    assert(device->adapter->instance->surfaces_table != CGPU_NULLPTR && "surfaces_table Missing!");
+    assert(device->adapter->instance->surfaces_table->from_hwnd != CGPU_NULLPTR && "free_instance Proc Missing!");
+
+    return device->adapter->instance->surfaces_table->cgpu_free_surface(device, surface);
+}
 //

@@ -7,7 +7,7 @@
 
 const CGpuSurfacesProcTable s_tbl_vk = 
 {
-    .cgpu_surface_free = cgpu_surface_free_vulkan,
+    .cgpu_free_surface = cgpu_free_surface_vulkan,
 #if defined(_WIN32) || defined(_WIN64)
     .from_hwnd = cgpu_surface_from_hwnd_vulkan
 #endif
@@ -18,7 +18,7 @@ const CGpuSurfacesProcTable* CGPU_VulkanSurfacesProcTable()
 	return &s_tbl_vk;
 }
 
-void cgpu_surface_free_vulkan(CGpuDeviceId device, CGpuSurfaceId surface)
+void cgpu_free_surface_vulkan(CGpuDeviceId device, CGpuSurfaceId surface)
 {
 	assert(surface && "CGPU VULKAN ERROR: NULL surface!");
 

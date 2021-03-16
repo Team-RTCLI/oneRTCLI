@@ -61,13 +61,10 @@ typedef struct CGpuCommandEncoderDescriptor {
     uint32_t ___nothing_and_useless__;
 } CGpuCommandEncoderDescriptor;
 
-typedef struct CGpuSurface {
-    void* ptr;
-} CGpuSurface;
-typedef CGpuSurface* CGpuSurfaceId;
+typedef struct CGpuSurface_Dummy* CGpuSurfaceId;
 
 typedef struct CGpuSwapChainDescriptor {
-    CGpuSurface surface;
+    CGpuSurfaceId surface;
     /// Number of backbuffers in this swapchain
 	uint32_t imageCount;
 	/// Width of the swapchain
@@ -81,7 +78,6 @@ typedef struct CGpuSwapChainDescriptor {
     /// Clear Value.
     float clearValue[4];
 } CGpuSwapChainDescriptor;
-
 
 typedef struct CGpuInstance* CGpuInstanceId;
 typedef struct CGpuAdapter {
@@ -179,7 +175,7 @@ typedef struct CGpuProcTable {
 } CGpuProcTable;
 
 // surfaces
-CGPU_API void cgpu_surface_free(CGpuDeviceId device, CGpuSurfaceId surface);
+CGPU_API void cgpu_free_surface(CGpuDeviceId device, CGpuSurfaceId surface);
 typedef void (*CGPUSurfaceProc_Free)(CGpuDeviceId device, CGpuSurfaceId surface);
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -202,7 +198,7 @@ typedef struct CGpuSurfacesProcTable {
     CGPUSurfaceProc_CreateFromUIView from_ui_view;
     CGPUSurfaceProc_CreateFromNSView from_ns_view;
 #endif
-    CGPUSurfaceProc_Free cgpu_surface_free;
+    CGPUSurfaceProc_Free cgpu_free_surface;
 } CGpuSurfacesProcTable;
 
 typedef struct CGpuInstance {

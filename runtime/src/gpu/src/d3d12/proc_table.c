@@ -26,7 +26,7 @@ const CGpuProcTable* CGPU_D3D12ProcTable()
 
 const CGpuSurfacesProcTable s_tbl_d3d12 = 
 {
-    .cgpu_surface_free = cgpu_surface_free_d3d12,
+    .cgpu_free_surface = cgpu_free_surface_d3d12,
 #if defined(_WIN32) || defined(_WIN64)
     .from_hwnd = cgpu_surface_from_hwnd_d3d12
 #endif

@@ -22,10 +22,12 @@
         #include <dawn_native/VulkanBackend.h>
     #endif
     
-    void cgpu_surface_free_webgpu(CGpuDeviceId device, CGpuSurfaceId surface)
+    void cgpu_free_surface_webgpu(CGpuDeviceId device, CGpuSurfaceId surface)
     {
+        CGpuDevice_WebGpu* D = (CGpuDevice_WebGpu*)device;
     #ifdef DAWN_ENABLE_BACKEND_VULKAN
-        
+        auto vkInstance = dawn_native::vulkan::GetInstance(D->pWGPUDevice);
+        vkDestroySurfaceKHR(vkInstance, (VkSurfaceKHR)surface, nullptr);
     #endif
     }
 

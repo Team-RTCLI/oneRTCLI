@@ -64,6 +64,8 @@ TEST_P(SwapChainCreation, CreateFromHWND)
         EXPECT_NE(surface, CGPU_NULLPTR);
         EXPECT_NE(surface, nullptr);
 
+        cgpu_free_surface(device, surface);
+
         cgpu_free_device(device);
     }
 }
