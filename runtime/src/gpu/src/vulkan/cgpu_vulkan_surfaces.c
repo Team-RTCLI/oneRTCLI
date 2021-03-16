@@ -7,7 +7,7 @@
 
 const CGpuSurfacesProcTable s_tbl_vk = 
 {
-    .cgpu_free_surface = cgpu_free_surface_vulkan,
+    .free_surface = cgpu_free_surface_vulkan,
 #if defined(_WIN32) || defined(_WIN64)
     .from_hwnd = cgpu_surface_from_hwnd_vulkan
 #endif

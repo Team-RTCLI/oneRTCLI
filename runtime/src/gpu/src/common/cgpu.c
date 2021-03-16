@@ -169,18 +169,52 @@ CGPU_API void cgpu_free_command_encoder(CGpuCommandEncoderId encoder)
     return encoder->queue->device->adapter->instance->proc_table->free_command_encoder(encoder);
 }
 
-
-// surfaces
-CGpuSurfaceId cgpu_surface_from_hwnd(CGpuDeviceId device, HWND window)
+CGpuSwapChainId cgpu_create_swapchain(CGpuDeviceId device, const CGpuSwapChainDescriptor* desc)
 {
     assert(device != CGPU_NULLPTR && "fatal: call on NULL device!");
     assert(device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
-    assert(device->adapter->instance != CGPU_NULLPTR && "fatal: call on NULL instnace!");
-    assert(device->adapter->instance->surfaces_table != CGPU_NULLPTR && "surfaces_table Missing!");
-    assert(device->adapter->instance->surfaces_table->from_hwnd != CGPU_NULLPTR && "free_instance Proc Missing!");
+    assert(device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
+    assert(device->adapter->instance->proc_table->create_swapchain && "create_swapchain Proc Missing!");
 
-    return device->adapter->instance->surfaces_table->from_hwnd(device, window);
+    if (desc->presentQueues == CGPU_NULLPTR) {
+        assert(desc->presentQueuesCount <= 0 &&
+            "fatal cgpu_create_swapchain: queue array & queue coutn dismatch!");
+    } else {
+        assert(desc->presentQueuesCount > 0 && 
+            "fatal cgpu_create_swapchain: queue array & queue coutn dismatch!");
+    }
+
+
+    CGpuSwapChainId swapchain = device->adapter->instance->proc_table->create_swapchain(device, desc);
+    swapchain->device = device;
+    return swapchain;
 }
+
+void cgpu_free_swapchain(CGpuSwapChainId swapchain)
+{
+    assert(swapchain != CGPU_NULLPTR && "fatal: call on NULL swapchain!");
+    assert(swapchain->device != CGPU_NULLPTR && "fatal: call on NULL device!");
+    assert(swapchain->device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
+    assert(swapchain->device->adapter->instance != CGPU_NULLPTR && "fatal: Missing instance of adapter!");
+    assert(swapchain->device->adapter->instance->proc_table->create_swapchain && "create_swapchain Proc Missing!");
+
+    return swapchain->device->adapter->instance->proc_table->free_swapchain(swapchain);
+}
+
+
+// surfaces
+#if defined(_WIN32) || defined(_WIN64)
+    CGpuSurfaceId cgpu_surface_from_hwnd(CGpuDeviceId device, HWND window)
+    {
+        assert(device != CGPU_NULLPTR && "fatal: call on NULL device!");
+        assert(device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
+        assert(device->adapter->instance != CGPU_NULLPTR && "fatal: call on NULL instnace!");
+        assert(device->adapter->instance->surfaces_table != CGPU_NULLPTR && "surfaces_table Missing!");
+        assert(device->adapter->instance->surfaces_table->from_hwnd != CGPU_NULLPTR && "free_instance Proc Missing!");
+
+        return device->adapter->instance->surfaces_table->from_hwnd(device, window);
+    }
+#endif
 
 void cgpu_free_surface(CGpuDeviceId device, CGpuSurfaceId surface)
 {
@@ -190,6 +224,6 @@ void cgpu_free_surface(CGpuDeviceId device, CGpuSurfaceId surface)
     assert(device->adapter->instance->surfaces_table != CGPU_NULLPTR && "surfaces_table Missing!");
     assert(device->adapter->instance->surfaces_table->from_hwnd != CGPU_NULLPTR && "free_instance Proc Missing!");
 
-    return device->adapter->instance->surfaces_table->cgpu_free_surface(device, surface);
+    return device->adapter->instance->surfaces_table->free_surface(device, surface);
 }
 //

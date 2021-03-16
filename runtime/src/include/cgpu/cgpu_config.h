@@ -1,10 +1,20 @@
 #pragma once
+#include "stdbool.h"
 
 #define CGPU_USE_WEBGPU
 #define CGPU_USE_VULKAN
 #define CGPU_USE_D3D12
 #define CGPU_BUILD_LIB
 
+#ifdef __cplusplus
+#ifndef CGPU_NULLPTR
+#define CGPU_NULLPTR nullptr
+#endif
+#else
+#ifndef CGPU_NULLPTR
+#define CGPU_NULLPTR NULL
+#endif
+#endif
 
 #ifndef CGPU_MANUAL_CONFIG_CPU_ARCHITECTURE
     #if defined(__x86_64__) || defined(_M_X64) || defined(_AMD64_) || defined(_M_AMD64)

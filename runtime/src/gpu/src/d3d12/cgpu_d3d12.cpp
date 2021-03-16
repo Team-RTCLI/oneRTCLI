@@ -1,6 +1,7 @@
 #define DLL_IMPLEMENTATION
 
 #include "cgpu/backend/d3d12/cgpu_d3d12.h"
+#include "cgpu/backend/d3d12/bridge.h"
 #include <assert.h>
 #include <stdlib.h>
 #ifdef CGPU_USE_D3D12
@@ -331,6 +332,64 @@ void cgpu_free_command_encoder_d3d12(CGpuCommandEncoderId encoder)
 
     free_transient_command_allocator(E->pCommandAllocator);
     delete E;
+}
+
+CGpuSwapChainId cgpu_create_swapchain_d3d12(CGpuDeviceId device, const CGpuSwapChainDescriptor* desc)
+{
+    CGpuInstance_D3D12* I = (CGpuInstance_D3D12*)device->adapter->instance;
+    CGpuDevice_D3D12* D = (CGpuDevice_D3D12*)device;
+    CGpuSwapChain_D3D12* S = new CGpuSwapChain_D3D12();
+
+    S->mDxSyncInterval = desc->enableVsync ? 1 : 0;
+    DXGI_SWAP_CHAIN_DESC1 desc1 = {};
+    desc1.Width = desc->width;
+    desc1.Height = desc->height;
+    desc1.Format = pf_translate_to_d3d12(desc->format);
+    desc1.Stereo = false;
+    desc1.SampleDesc.Count = 1;    // If multisampling is needed, we'll resolve it later
+    desc1.SampleDesc.Quality = 0;
+    desc1.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    desc1.BufferCount = desc->imageCount;
+    desc1.Scaling = DXGI_SCALING_STRETCH;
+    desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // for better performance.
+    desc1.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+    desc1.Flags = 0;
+    BOOL allowTearing = FALSE;
+    I->pDXGIFactory->CheckFeatureSupport(
+        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing));
+    desc1.Flags |= allowTearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+    S->mFlags |= (!desc->enableVsync && allowTearing) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+
+    IDXGISwapChain1* swapchain;
+    HWND hwnd = (HWND)desc->surface;
+
+    CGpuQueue_D3D12* Q = CGPU_NULLPTR;
+    if (desc->presentQueues == CGPU_NULLPTR) {
+        Q = reinterpret_cast<CGpuQueue_D3D12*>(
+            cgpu_get_queue_d3d12(device, ECGpuQueueType_Graphics, 0));
+    } else {
+        Q = reinterpret_cast<CGpuQueue_D3D12*>(desc->presentQueues[0]);
+    }
+    auto bCreated = SUCCEEDED(I->pDXGIFactory->CreateSwapChainForHwnd(
+        Q->pCommandQueue, hwnd, &desc1, NULL, NULL, &swapchain));
+    assert(bCreated && "Failed to Try to Create SwapChain!");
+
+    auto bAssociation = SUCCEEDED(I->pDXGIFactory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER));
+    assert(bAssociation && "Failed to Try to Associate SwapChain With Window!");
+
+    auto bQueryChain3 = SUCCEEDED(swapchain->QueryInterface(IID_PPV_ARGS(&S->pDxSwapChain)));
+    assert(bQueryChain3 && "Failed to Query IDXGISwapChain3 from Created SwapChain!");
+
+    swapchain->Release();
+
+    return &S->super;
+}
+
+void cgpu_free_swapchain_d3d12(CGpuSwapChainId swapchain)
+{
+    CGpuSwapChain_D3D12* S = reinterpret_cast<CGpuSwapChain_D3D12*>(swapchain);
+    S->pDxSwapChain->Release();
+    delete S;
 }
 
 #include "cgpu/extensions/cgpu_d3d12_exts.h"

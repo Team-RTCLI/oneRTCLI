@@ -21,6 +21,8 @@ CGpuQueueId cgpu_get_queue_d3d12(CGpuDeviceId device, ECGpuQueueType type, uint3
 void cgpu_free_queue_d3d12(CGpuQueueId queue);
 CGpuCommandEncoderId cgpu_create_command_encoder_d3d12(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
 void cgpu_free_command_encoder_d3d12(CGpuCommandEncoderId pool);
+CGpuSwapChainId cgpu_create_swapchain_d3d12(CGpuDeviceId device, const CGpuSwapChainDescriptor* desc);
+void cgpu_free_swapchain_d3d12(CGpuSwapChainId swapchain);
 
 typedef struct CGpuInstance_D3D12 {
     CGpuInstance super;
@@ -76,6 +78,15 @@ typedef struct CGpuCommandEncoder_D3D12 {
     CGpuCommandEncoder super;
     ID3D12CommandAllocator* pCommandAllocator;
 } CGpuCommandEncoder_D3D12;
+
+typedef struct CGpuSwapChain_D3D12 {
+    CGpuSwapChain            super;
+    IDXGISwapChain3*         pDxSwapChain;
+    uint32_t                 mDxSyncInterval : 3;
+    uint32_t                 mFlags : 10;
+    uint32_t                 mImageCount : 3;
+    uint32_t                 mEnableVsync : 1;
+} CGpuSwapChain_D3D12;
 
 #ifdef __cplusplus
 } // end extern "C"

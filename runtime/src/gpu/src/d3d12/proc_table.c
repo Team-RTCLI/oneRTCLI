@@ -15,7 +15,9 @@ const CGpuProcTable tbl_d3d12 =
     .get_queue = &cgpu_get_queue_d3d12,
     .free_queue = &cgpu_free_queue_d3d12,
     .create_command_encoder = &cgpu_create_command_encoder_d3d12,
-    .free_command_encoder = &cgpu_free_command_encoder_d3d12
+    .free_command_encoder = &cgpu_free_command_encoder_d3d12,
+    .create_swapchain = &cgpu_create_swapchain_d3d12,
+    .free_swapchain = &cgpu_free_swapchain_d3d12
 };
 
 const CGpuProcTable* CGPU_D3D12ProcTable()
@@ -26,7 +28,7 @@ const CGpuProcTable* CGPU_D3D12ProcTable()
 
 const CGpuSurfacesProcTable s_tbl_d3d12 = 
 {
-    .cgpu_free_surface = cgpu_free_surface_d3d12,
+    .free_surface = cgpu_free_surface_d3d12,
 #if defined(_WIN32) || defined(_WIN64)
     .from_hwnd = cgpu_surface_from_hwnd_d3d12
 #endif

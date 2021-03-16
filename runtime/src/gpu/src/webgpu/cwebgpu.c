@@ -24,7 +24,7 @@ const CGpuProcTable tbl_webgpu =
 
 const CGpuSurfacesProcTable s_tbl_webgpu = 
 {
-    .cgpu_free_surface = cgpu_free_surface_webgpu,
+    .free_surface = cgpu_free_surface_webgpu,
 #if defined(_WIN32) || defined(_WIN64)
     .from_hwnd = cgpu_surface_from_hwnd_webgpu
 #endif

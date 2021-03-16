@@ -49,7 +49,7 @@ void cgpu_enum_adapters_vulkan(CGpuInstanceId instance, CGpuAdapterId* const ada
 CGpuAdapterDetail cgpu_query_adapter_detail_vulkan(const CGpuAdapterId adapter)
 {
     CGpuAdapter_Vulkan* a = (CGpuAdapter_Vulkan*)adapter;
-    CGpuAdapterDetail d = {};
+    CGpuAdapterDetail d = {0};
 	d.deviceId = a->mPhysicalDeviceProps.deviceID;
 	d.vendorId = a->mPhysicalDeviceProps.vendorID;
 	d.name = a->mPhysicalDeviceProps.deviceName;
@@ -122,7 +122,7 @@ void cgpu_free_queue_vulkan(CGpuQueueId queue)
 VkCommandPool allocate_transient_command_pool(CGpuDevice_Vulkan* D, CGpuQueueId queue)
 {
 	VkCommandPool P = VK_NULL_HANDLE;
-	CGpuQueue_Vulkan* Q = (CGpuQueue_Vulkan*)queue;
+	//CGpuQueue_Vulkan* Q = (CGpuQueue_Vulkan*)queue;
 	CGpuAdapter_Vulkan* A = (CGpuAdapter_Vulkan*)queue->device->adapter;
 
 	VkCommandPoolCreateInfo create_info = {0};
