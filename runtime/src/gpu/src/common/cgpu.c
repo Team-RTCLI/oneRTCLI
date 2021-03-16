@@ -31,7 +31,12 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
     const CGpuProcTable* tbl = CGPU_NULLPTR;
     const CGpuSurfacesProcTable* s_tbl = CGPU_NULLPTR;
 
-    if(desc->backend == ECGPUBackEnd_WEBGPU)
+    if (desc->backend == ECGPUBackEnd_COUNT)
+    {
+        
+    }
+#ifdef CGPU_USE_WEBGPU
+    else if(desc->backend == ECGPUBackEnd_WEBGPU)
     {
 #ifdef DAWN_ENABLE_BACKEND_D3D12 
         WGPUBackendType type = WGPUBackendType_D3D12;
@@ -42,13 +47,20 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
 #endif
         tbl = CGPU_WebGPUProcTable(type);
         s_tbl = CGPU_WebGPUSurfacesProcTable();
-    } else if (desc->backend == ECGPUBackEnd_VULKAN) {
+    } 
+#endif
+#ifdef CGPU_USE_VULKAN
+    else if (desc->backend == ECGPUBackEnd_VULKAN) {
         tbl = CGPU_VulkanProcTable();
         s_tbl = CGPU_VulkanSurfacesProcTable();
-    } else if (desc->backend == ECGPUBackEnd_D3D12) {
+    } 
+#endif
+#ifdef CGPU_USE_D3D12
+    else if (desc->backend == ECGPUBackEnd_D3D12) {
         tbl = CGPU_D3D12ProcTable();
         s_tbl = CGPU_D3D12SurfacesProcTable();
     }
+#endif
     CGpuInstanceId instance = tbl->create_instance(desc);
     instance->proc_table = tbl;
     instance->surfaces_table = s_tbl;

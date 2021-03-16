@@ -1,10 +1,8 @@
 #define DLL_IMPLEMENTATION
-
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
 #include "cgpu/extensions/cgpu_vulkan_exts.h"
 #include <assert.h>
 #include <stdlib.h>
-
 #ifdef CGPU_USE_VULKAN
 
 const CGpuProcTable tbl_vk = 

@@ -1,12 +1,11 @@
 #define DLL_IMPLEMENTATION
-
 #include "cgpu/extensions/cgpu_vulkan_exts.h"
 #include "cgpu/backend/vulkan/cgpu_vulkan.h"
 #include <cassert>
 #include <stdlib.h>
 #include <vector>
-
 #ifdef CGPU_USE_VULKAN
+
 const char* validation_layer_name = "VK_LAYER_KHRONOS_validation";
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(

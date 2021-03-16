@@ -25,6 +25,13 @@ namespace impl
 #ifdef __EMSCRIPTEN__
 
 #else 
+    #if defined(_WIN32) || defined(_WIN64)
+        #define VK_USE_PLATFORM_WIN32_KHR
+    #endif
+    #ifdef DAWN_ENABLE_BACKEND_VULKAN
+            #include "volk.h"
+            #include <dawn_native/VulkanBackend.h>
+    #endif
 // dawn implementation
 #include "dawn_platform/dawn_platform_export.h"
 #include "dawn/webgpu_cpp.h"
@@ -58,13 +65,18 @@ public:
         mDawnInstance = std::make_unique<dawn_native::Instance>();
         mDawnInstance->DiscoverDefaultAdapters();
         auto dawn_native_adapters = mDawnInstance->GetAdapters();
-        dawn_adapters.resize(dawn_native_adapters.size());
-        for(auto i = 0u; i < dawn_adapters.size(); i++)
+        for(auto i = 0u; i < dawn_native_adapters.size(); i++)
         {
-            dawn_adapters[i].super.instance = &this->super;
-            dawn_adapters[i].dawn_native_adapter = dawn_native_adapters[i];
-
-            dawn_native_adapters[i].GetProperties(&dawn_adapters[i].properties);
+            wgpu::AdapterProperties prop;
+            dawn_native_adapters[i].GetProperties(&prop);
+            if(static_cast<WGPUBackendType>(prop.backendType) == type)
+            {
+                GpuAdapterDawn A = {};
+                A.super.instance = &this->super;
+                A.dawn_native_adapter = dawn_native_adapters[i];
+                A.properties = prop;
+                dawn_adapters.emplace_back(A);
+            }
         }
         backend = type;
     }
@@ -137,6 +149,13 @@ CGpuDeviceId cgpu_create_device_webgpu(CGpuAdapterId adapter, const CGpuDeviceDe
 		procs.deviceSetUncapturedErrorCallback(created->pWGPUDevice, impl::printError, nullptr);
 		dawnProcSetProcs(&procs);
     }
+#ifdef DAWN_ENABLE_BACKEND_VULKAN
+    auto vkInstance = dawn_native::vulkan::GetInstance(created->pWGPUDevice);
+    if(VK_SUCCESS != volkInitialize()){
+        assert(0 && "load vk procs failed!");
+    }
+    volkLoadInstance(vkInstance);
+#endif
     return &created->super;
 }
 

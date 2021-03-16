@@ -6,9 +6,6 @@
 #define CGPU_BUILD_LIB
 
 
-
-
-
 #ifndef CGPU_MANUAL_CONFIG_CPU_ARCHITECTURE
     #if defined(__x86_64__) || defined(_M_X64) || defined(_AMD64_) || defined(_M_AMD64)
         #define CGPU_PLATFORM_X86_64
@@ -206,10 +203,10 @@
 #endif 
 
 #ifdef CGPU_USE_WEBGPU
-    #if __has_include("d3d12.h") || (_MSC_VER >= 1900)
-    #define DAWN_ENABLE_BACKEND_D3D12
-    #elif __has_include("vulkan/vulkan.h") && (defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
+    #if __has_include("vulkan/vulkan.h") && (defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
     #define DAWN_ENABLE_BACKEND_VULKAN
+    #elif __has_include("d3d12.h") || (_MSC_VER >= 1900)
+    #define DAWN_ENABLE_BACKEND_D3D12
     #elif defined(__APPLE__)
     #define DAWN_ENABLE_BACKEND_METAL
     #endif

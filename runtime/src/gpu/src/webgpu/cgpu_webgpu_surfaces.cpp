@@ -1,57 +1,66 @@
+#define DLL_IMPLEMENTATION
 #include "cgpu/api.h"
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
 #include "cgpu/backend/webgpu/cgpu_webgpu_surfaces.h"
-#include "dawn/webgpu.h"
+#include <cassert>
 
-const CGpuSurfacesProcTable s_tbl_webgpu = 
-{
-    .cgpu_surface_free = cgpu_surface_free_webgpu,
-#if defined(_WIN32) || defined(_WIN64)
-    .from_hwnd = cgpu_surface_from_hwnd_webgpu
-#endif
-};
+#ifdef __EMSCRIPTEN__
 
-const CGpuSurfacesProcTable* CGPU_WebGPUSurfacesProcTable()
-{
-	return &s_tbl_webgpu;
-}
+#else
+    #include "dawn/webgpu.h"
+    #include "dawn_native/DawnNative.h"
 
-void cgpu_surface_free_webgpu(CGpuDeviceId device, CGpuSurfaceId surface)
-{
+    #if defined(_WIN32) || defined(_WIN64)
+        #define VK_USE_PLATFORM_WIN32_KHR
+        #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN
+        #endif
+        #include "windows.h"
+    #endif
+    #ifdef DAWN_ENABLE_BACKEND_VULKAN
+        #include "volk.h"
+        #include <dawn_native/VulkanBackend.h>
+    #endif
     
-}
-
-#if defined(_WIN32) || defined(_WIN64)
-
-#ifdef DAWN_ENABLE_BACKEND_VULKAN
-
-static VkSurfaceKHR createVkSurface(WGPUDevice device, HWND window) {
-	VkSurfaceKHR surface = VK_NULL_HANDLE;
-	VkWin32SurfaceCreateInfoKHR info = {};
-	info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	info.hinstance = GetModuleHandle(NULL);
-	info.hwnd = window;
-	vkCreateWin32SurfaceKHR(
-		dawn_native::vulkan::GetInstance(device),
-		&info, nullptr, &surface);
-	return surface;
-}
-#endif //DAWN_ENABLE_BACKEND_VULKAN
-
-CGpuSurfaceId cgpu_surface_from_hwnd_webgpu(CGpuDeviceId device, HWND window)
-{
-    CGpuInstance_WebGpu* I = (CGpuInstance_WebGpu*)device->adapter->instance;
-    switch (I->backend)
+    void cgpu_surface_free_webgpu(CGpuDeviceId device, CGpuSurfaceId surface)
     {
-        case WGPUBackendType_D3D12: 
-            return (CGpuSurfaceId)window;
-        case WGPUBackendType_Vulkan:
-        {
-            //createVkSurface(I->, window.handle())
-        }
-        default: return CGPU_NULLPTR;
+    #ifdef DAWN_ENABLE_BACKEND_VULKAN
+        
+    #endif
     }
-    return CGPU_NULLPTR;
-}
 
-#endif
+    #if defined(_WIN32) || defined(_WIN64)
+        #ifdef DAWN_ENABLE_BACKEND_VULKAN
+
+            static VkSurfaceKHR createVkSurface(WGPUDevice device, HWND window) 
+            {
+                VkSurfaceKHR surface = VK_NULL_HANDLE;
+                VkWin32SurfaceCreateInfoKHR info = {};
+                info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+                info.hinstance = GetModuleHandle(NULL);
+                info.hwnd = window;
+                auto vkInstance = dawn_native::vulkan::GetInstance(device);
+
+                vkCreateWin32SurfaceKHR(vkInstance, &info, nullptr, &surface);
+                return surface;
+            }
+        #endif //DAWN_ENABLE_BACKEND_VULKAN
+
+        CGpuSurfaceId cgpu_surface_from_hwnd_webgpu(CGpuDeviceId device, HWND window)
+        {
+            CGpuDevice_WebGpu* D = (CGpuDevice_WebGpu*)device;
+            CGpuInstance_WebGpu* I = (CGpuInstance_WebGpu*)device->adapter->instance;
+            switch (I->backend)
+            {
+                case WGPUBackendType_D3D12: 
+                    return (CGpuSurfaceId)window;
+                case WGPUBackendType_Vulkan:
+                    return (CGpuSurfaceId)createVkSurface(D->pWGPUDevice, window);
+                default:
+                    return CGPU_NULLPTR;
+            }
+            return CGPU_NULLPTR;
+        }
+    #endif // _WIN32 || _WIN64
+
+#endif //__EMSCRIPTEN__

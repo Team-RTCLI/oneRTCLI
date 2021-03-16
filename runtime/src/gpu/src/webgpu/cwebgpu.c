@@ -3,6 +3,7 @@
 #include "cgpu/api.h"
 #ifdef CGPU_USE_WEBGPU
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
+#include "cgpu/backend/webgpu/cgpu_webgpu_surfaces.h"
 #include <assert.h>
 #include "cgpu/backend/webgpu/bridge.h"
 
@@ -20,6 +21,19 @@ const CGpuProcTable tbl_webgpu =
     .create_command_encoder = &cgpu_create_command_encoder_webgpu,
     .free_command_encoder = &cgpu_free_command_encoder_webgpu
 };
+
+const CGpuSurfacesProcTable s_tbl_webgpu = 
+{
+    .cgpu_surface_free = cgpu_surface_free_webgpu,
+#if defined(_WIN32) || defined(_WIN64)
+    .from_hwnd = cgpu_surface_from_hwnd_webgpu
+#endif
+};
+
+const CGpuSurfacesProcTable* CGPU_WebGPUSurfacesProcTable()
+{
+	return &s_tbl_webgpu;
+}
 
 const CGpuProcTable* CGPU_WebGPUProcTable(const WGPUBackendType t)
 {
