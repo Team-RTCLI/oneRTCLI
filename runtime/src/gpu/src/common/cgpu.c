@@ -1,6 +1,7 @@
 #include "cgpu/api.h"
 #ifdef CGPU_USE_WEBGPU
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
+#include "cgpu/backend/webgpu/cgpu_webgpu_surfaces.h"
 #include "cgpu/extensions/cgpu_webgpu_exts.h"
 #endif
 #ifdef CGPU_USE_VULKAN
@@ -32,10 +33,12 @@ CGpuInstanceId cgpu_create_instance(const CGpuInstanceDescriptor* desc)
 
     if(desc->backend == ECGPUBackEnd_WEBGPU)
     {
-#ifdef _MACOS 
-        WGPUBackendType type = WGPUBackendType_Metal;
-#else
+#ifdef DAWN_ENABLE_BACKEND_D3D12 
+        WGPUBackendType type = WGPUBackendType_D3D12;
+#elif defined(DAWN_ENABLE_BACKEND_VULKAN)
         WGPUBackendType type = WGPUBackendType_Vulkan;
+#elif defined(DAWN_ENABLE_BACKEND_METAL)
+        WGPUBackendType type = WGPUBackendType_Metal;
 #endif
         tbl = CGPU_WebGPUProcTable(type);
         s_tbl = CGPU_WebGPUSurfacesProcTable();
@@ -156,13 +159,15 @@ CGPU_API void cgpu_free_command_encoder(CGpuCommandEncoderId encoder)
 
 
 // surfaces
-CGpuSurfaceId cgpu_surface_from_hwnd(CGpuInstanceId instance, HWND window)
+CGpuSurfaceId cgpu_surface_from_hwnd(CGpuDeviceId device, HWND window)
 {
-    assert(instance != CGPU_NULLPTR && "fatal: can't destroy NULL instance!");
-    assert(instance->surfaces_table != CGPU_NULLPTR && "surfaces_table Missing!");
-    assert(instance->surfaces_table->from_hwnd != CGPU_NULLPTR && "free_instance Proc Missing!");
+    assert(device != CGPU_NULLPTR && "fatal: call on NULL device!");
+    assert(device->adapter != CGPU_NULLPTR && "fatal: call on NULL adapter!");
+    assert(device->adapter->instance != CGPU_NULLPTR && "fatal: call on NULL instnace!");
+    assert(device->adapter->instance->surfaces_table != CGPU_NULLPTR && "surfaces_table Missing!");
+    assert(device->adapter->instance->surfaces_table->from_hwnd != CGPU_NULLPTR && "free_instance Proc Missing!");
 
-    return instance->surfaces_table->from_hwnd(instance, window);
+    return device->adapter->instance->surfaces_table->from_hwnd(device, window);
 }
 
 //

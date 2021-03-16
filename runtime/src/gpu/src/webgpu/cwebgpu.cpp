@@ -48,10 +48,12 @@ class GpuInstanceDawn : public CGpuInstance_WebGpu
 public:
     GpuInstanceDawn()
     {
-#ifdef _MACOS 
-        WGPUBackendType type = WGPUBackendType_Metal;
-#else
+#ifdef DAWN_ENABLE_BACKEND_D3D12 
+        WGPUBackendType type = WGPUBackendType_D3D12;
+#elif defined(DAWN_ENABLE_BACKEND_VULKAN)
         WGPUBackendType type = WGPUBackendType_Vulkan;
+#elif defined(DAWN_ENABLE_BACKEND_METAL)
+        WGPUBackendType type = WGPUBackendType_Metal;
 #endif
         mDawnInstance = std::make_unique<dawn_native::Instance>();
         mDawnInstance->DiscoverDefaultAdapters();

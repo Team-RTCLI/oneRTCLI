@@ -37,10 +37,35 @@ HWND createWin32Window();
 TEST_P(SwapChainCreation, CreateFromHWND)
 {
     auto hwnd = createWin32Window();
-    auto surface = cgpu_surface_from_hwnd(instance, hwnd);
+    size_t adapters_count = 0;
+    cgpu_enum_adapters(instance, nullptr, &adapters_count);
+    std::vector<CGpuAdapterId> adapters; adapters.resize(adapters_count);
+    cgpu_enum_adapters(instance, adapters.data(), &adapters_count);
+    for(auto adapter : adapters)
+    {
+        auto gQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Graphics); 
+        auto cQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Compute); 
+        auto tQueue = cgpu_query_queue_count(adapter, ECGpuQueueType_Transfer); 
 
-    EXPECT_NE(surface, CGPU_NULLPTR);
-    EXPECT_NE(surface, nullptr);
+        std::vector<CGpuQueueGroupDescriptor> queueGroup; 
+        if(gQueue > 0) queueGroup.push_back(CGpuQueueGroupDescriptor{ECGpuQueueType_Graphics, 1});
+        if(cQueue > 0) queueGroup.push_back(CGpuQueueGroupDescriptor{ECGpuQueueType_Compute, 1});
+        if(tQueue > 0) queueGroup.push_back(CGpuQueueGroupDescriptor{ECGpuQueueType_Transfer, 1});
+        CGpuDeviceDescriptor descriptor = {};
+        descriptor.queueGroups = queueGroup.data();
+        descriptor.queueGroupCount = queueGroup.size();
+
+        auto device = cgpu_create_device(adapter, &descriptor);
+        EXPECT_NE(device, nullptr);
+        EXPECT_NE(device, CGPU_NULLPTR);
+
+        auto surface = cgpu_surface_from_hwnd(device, hwnd);
+
+        EXPECT_NE(surface, CGPU_NULLPTR);
+        EXPECT_NE(surface, nullptr);
+
+        cgpu_free_device(device);
+    }
 }
 #endif
 

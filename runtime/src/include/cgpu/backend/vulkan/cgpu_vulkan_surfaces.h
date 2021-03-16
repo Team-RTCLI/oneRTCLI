@@ -7,10 +7,10 @@ extern "C" {
 
 const CGpuSurfacesProcTable* CGPU_VulkanSurfacesProcTable();
 
-void cgpu_surface_free_vulkan(CGpuInstanceId instance, CGpuSurfaceId surface);
+void cgpu_surface_free_vulkan(CGpuDeviceId device, CGpuSurfaceId surface);
 
 #if defined(_WIN32) || defined(_WIN64)
-CGpuSurfaceId cgpu_surface_from_hwnd_vulkan(CGpuInstanceId instance, HWND window);
+CGpuSurfaceId cgpu_surface_from_hwnd_vulkan(CGpuDeviceId device, HWND window);
 #endif
 
 #ifdef __cplusplus

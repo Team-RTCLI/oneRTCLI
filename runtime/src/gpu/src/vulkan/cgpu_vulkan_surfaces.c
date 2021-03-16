@@ -18,12 +18,11 @@ const CGpuSurfacesProcTable* CGPU_VulkanSurfacesProcTable()
 	return &s_tbl_vk;
 }
 
-void cgpu_surface_free_vulkan(CGpuInstanceId instance, CGpuSurfaceId surface)
+void cgpu_surface_free_vulkan(CGpuDeviceId device, CGpuSurfaceId surface)
 {
-	assert(instance && "CGPU VULKAN ERROR: NULL instance!");
 	assert(surface && "CGPU VULKAN ERROR: NULL surface!");
 
-	CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)instance;
+	CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)device->adapter->instance;
     VkSurfaceKHR vkSurface = (VkSurfaceKHR)surface;
 	vkDestroySurfaceKHR(I->pVkInstance, vkSurface, GLOBAL_VkAllocationCallbacks);
 }
@@ -34,12 +33,11 @@ void cgpu_surface_free_vulkan(CGpuInstanceId instance, CGpuSurfaceId surface)
 #endif
 #include "windows.h"
 
-CGpuSurfaceId cgpu_surface_from_hwnd_vulkan(CGpuInstanceId instance, HWND window)
+CGpuSurfaceId cgpu_surface_from_hwnd_vulkan(CGpuDeviceId device, HWND window)
 {
-	assert(instance && "CGPU VULKAN ERROR: NULL instance!");
 	assert(window && "CGPU VULKAN ERROR: NULL HWND!");
 
-	CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)instance;
+	CGpuInstance_Vulkan* I = (CGpuInstance_Vulkan*)device->adapter->instance;
 	CGpuSurfaceId surface;
     VkWin32SurfaceCreateInfoKHR create_info = {0};
     create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;

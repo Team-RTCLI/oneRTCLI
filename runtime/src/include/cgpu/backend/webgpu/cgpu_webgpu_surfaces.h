@@ -11,10 +11,10 @@ extern "C" {
 
 const CGpuSurfacesProcTable* CGPU_WebGPUSurfacesProcTable();
 
-void cgpu_surface_free_webgpu(CGpuInstanceId instance, CGpuSurfaceId surface);
+void cgpu_surface_free_webgpu(CGpuDeviceId device, CGpuSurfaceId surface);
 
 #if defined(_WIN32) || defined(_WIN64)
-CGpuSurfaceId cgpu_surface_from_hwnd_webgpu(CGpuInstanceId instance, HWND window);
+CGpuSurfaceId cgpu_surface_from_hwnd_webgpu(CGpuDeviceId device, HWND window);
 #endif
 
 #ifdef __cplusplus

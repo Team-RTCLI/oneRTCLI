@@ -10,10 +10,10 @@ extern "C" {
 
 const CGpuSurfacesProcTable* CGPU_D3D12SurfacesProcTable();
 
-void cgpu_surface_free_d3d12(CGpuInstanceId instance, CGpuSurfaceId surface);
+void cgpu_surface_free_d3d12(CGpuDeviceId device, CGpuSurfaceId surface);
 
 #if defined(_WIN32) || defined(_WIN64)
-CGpuSurfaceId cgpu_surface_from_hwnd_d3d12(CGpuInstanceId instance, HWND window);
+CGpuSurfaceId cgpu_surface_from_hwnd_d3d12(CGpuDeviceId device, HWND window);
 #endif
 
 #ifdef __cplusplus
