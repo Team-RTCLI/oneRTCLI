@@ -5,7 +5,7 @@
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
 #include "cgpu/backend/webgpu/cgpu_webgpu_surfaces.h"
 #include <assert.h>
-#include "cgpu/backend/webgpu/bridge.h"
+#include "cgpu/backend/webgpu/webgpu_bridge.h"
 
 const CGpuProcTable tbl_webgpu = 
 {

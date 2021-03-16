@@ -28,6 +28,8 @@ CGpuQueueId cgpu_get_queue_vulkan(CGpuDeviceId device, ECGpuQueueType type, uint
 void cgpu_free_queue_vulkan(CGpuQueueId queue);
 CGpuCommandEncoderId cgpu_create_command_encoder_vulkan(CGpuQueueId queue, const CGpuCommandEncoderDescriptor* desc);
 void cgpu_free_command_encoder_vulkan(CGpuCommandEncoderId pool);
+CGpuSwapChainId cgpu_create_swapchain_vulkan(CGpuDeviceId device, const CGpuSwapChainDescriptor* desc);
+void cgpu_free_swapchain_vulkan(CGpuSwapChainId swapchain);
 
 typedef struct CGpuInstance_Vulkan {
     CGpuInstance super;
@@ -39,7 +41,7 @@ typedef struct CGpuInstance_Vulkan {
 
 typedef struct CGpuAdapter_Vulkan {
     CGpuAdapter super;
-    VkPhysicalDevice mPhysicalDevice;
+    VkPhysicalDevice pPhysicalDevice;
     VkPhysicalDeviceProperties mPhysicalDeviceProps;
     VkPhysicalDeviceFeatures mPhysicalDeviceFeatures;
     struct VkQueueFamilyProperties* pQueueFamilyProperties;
@@ -56,6 +58,7 @@ typedef struct CGpuDevice_Vulkan {
 typedef struct CGpuQueue_Vulkan {
     CGpuQueue super;
     VkQueue pVkQueue;
+    uint32_t mVkQueueFamilyIndex;
 } CGpuQueue_Vulkan;
 
 typedef struct CGpuCommandEncoder_Vulkan {
@@ -63,6 +66,26 @@ typedef struct CGpuCommandEncoder_Vulkan {
     VkCommandPool pVkCmdPool;
 } CGpuCommandEncoder_Vulkan;
 
+typedef struct CGpuSwapChain_Vulkan {
+    CGpuSwapChain  super;
+    VkSurfaceKHR   pVkSurface;
+    VkSwapchainKHR pVkSwapChain;
+} CGpuSwapChain_Vulkan;
+
+#ifdef __cplusplus
+} // end extern "C"
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+VkFormat pf_translate_to_vulkan(const ECGpuPixelFormat format);
+
+
+
+#include "cgpu_vulkan.inl"
 #ifdef __cplusplus
 } // end extern "C"
 #endif

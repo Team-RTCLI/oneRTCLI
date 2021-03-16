@@ -54,7 +54,9 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc,
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 	std::vector<const char*> exts = {
+#if defined(_WIN32) || defined(_WIN64)
 		VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#endif
 		VK_KHR_SURFACE_EXTENSION_NAME
 	};
 	if(desc->enableDebugLayer)
@@ -128,7 +130,7 @@ CGpuInstanceId cgpu_vulkan_create_instance(CGpuInstanceDescriptor const* desc,
 				VkAdapter.mQueueFamilyIndices[q] = -1;
 			}
 			VkAdapter.super.instance = &result->super;
-			VkAdapter.mPhysicalDevice = pysicalDevices[i];
+			VkAdapter.pPhysicalDevice = pysicalDevices[i];
 			vkGetPhysicalDeviceProperties(pysicalDevices[i], &VkAdapter.mPhysicalDeviceProps);
 			vkGetPhysicalDeviceFeatures(pysicalDevices[i], &VkAdapter.mPhysicalDeviceFeatures);
 
@@ -210,7 +212,7 @@ const float queuePriorities[] = {
 	1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,
 	1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,  1.f, 1.f, 1.f, 1.f,
 };
-
+const std::vector<const char*> deviceExtensionNames = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDescriptor* desc)
 {
 	CGpuInstance_Vulkan* vkInstance = (CGpuInstance_Vulkan*)adapter->instance;
@@ -240,7 +242,8 @@ CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDe
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
 	createInfo.queueCreateInfoCount = queueCreateInfos.size();
 	createInfo.pEnabledFeatures = &deviceFeatures;
-	createInfo.enabledExtensionCount = 0;
+	createInfo.ppEnabledExtensionNames = deviceExtensionNames.data();
+	createInfo.enabledExtensionCount = deviceExtensionNames.size();
 
 	if (vkInstance->pVkDebugUtilsMessenger) {
 		createInfo.enabledLayerCount = 1;
@@ -249,7 +252,7 @@ CGpuDeviceId cgpu_create_device_vulkan(CGpuAdapterId adapter, const CGpuDeviceDe
 		createInfo.enabledLayerCount = 0;
 	}
 
-	if (vkCreateDevice(a->mPhysicalDevice, &createInfo, nullptr, &vkDevice->pVkDevice) != VK_SUCCESS) {
+	if (vkCreateDevice(a->pPhysicalDevice, &createInfo, nullptr, &vkDevice->pVkDevice) != VK_SUCCESS) {
 		assert(0 && "failed to create logical device!");
 	}
 

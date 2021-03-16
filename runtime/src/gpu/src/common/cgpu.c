@@ -183,9 +183,8 @@ CGpuSwapChainId cgpu_create_swapchain(CGpuDeviceId device, const CGpuSwapChainDe
         assert(desc->presentQueuesCount > 0 && 
             "fatal cgpu_create_swapchain: queue array & queue coutn dismatch!");
     }
-
-
     CGpuSwapChainId swapchain = device->adapter->instance->proc_table->create_swapchain(device, desc);
+    assert(swapchain && "fatal cgpu_create_swapchain: NULL swapchain id returned from backend.");
     swapchain->device = device;
     return swapchain;
 }

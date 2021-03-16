@@ -6,7 +6,7 @@
 #include "cgpu/backend/webgpu/cgpu_webgpu.h"
 #include <cassert>
 #include <memory>
-#include "cgpu/backend/webgpu/bridge.h"
+#include "cgpu/backend/webgpu/webgpu_bridge.h"
 
 namespace impl
 {

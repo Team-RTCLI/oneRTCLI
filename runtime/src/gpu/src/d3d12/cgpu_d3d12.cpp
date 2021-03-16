@@ -1,7 +1,7 @@
 #define DLL_IMPLEMENTATION
 
 #include "cgpu/backend/d3d12/cgpu_d3d12.h"
-#include "cgpu/backend/d3d12/bridge.h"
+#include "cgpu/backend/d3d12/d3d12_bridge.h"
 #include <assert.h>
 #include <stdlib.h>
 #ifdef CGPU_USE_D3D12

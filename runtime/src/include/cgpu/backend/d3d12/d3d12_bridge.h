@@ -10,7 +10,6 @@ DXGI_FORMAT pf_translate_to_d3d12(const ECGpuPixelFormat form);
 
 
 
-
 #define trans_case(_format) case PF_##_format: return DXGI_FORMAT_##_format;
 
 inline DXGI_FORMAT pf_translate_to_d3d12(const ECGpuPixelFormat form)
