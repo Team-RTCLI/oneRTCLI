@@ -62,6 +62,8 @@ typedef double rtcli_64bit_aligned;
     //#define RTCLI_NATIVE_STRING_LENGTH(str) strlen((str))
 #endif
 
+typedef void (*VMMethodPointer)(struct VMStack* stack);
+
 #ifdef __cplusplus
 }
 #endif

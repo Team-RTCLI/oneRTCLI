@@ -1,1 +1,1 @@
-add_executable(AllocObjectTest main.cpp)
+add_executable(AllocObjectTest main.c)
