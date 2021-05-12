@@ -10,6 +10,7 @@
 extern "C" {
 #endif
 
+typedef unsigned char rtcli_byte;
 typedef uint8_t rtcli_u8;
 typedef int8_t rtcli_i8;
 typedef uint16_t rtcli_u16;
@@ -26,8 +27,19 @@ typedef size_t rtcli_usize;
 typedef ptrdiff_t rtcli_isize;
 typedef void rtcli_void;
 
+#include <stdbool.h>
+typedef bool rtcli_bool;
+
 typedef rtcli_u32 rtcli_rc;
 typedef rtcli_u32 rtcli_object_flags;
+
+typedef struct rtcli_guid
+{
+    rtcli_u32 data1;
+    rtcli_u16 data2;
+    rtcli_u16 data3;
+    rtcli_u8  data4[8];
+} rtcli_guid;
 
 /* Alignment for VMArray.vector */
 #if defined(_AIX)
@@ -62,7 +74,8 @@ typedef double rtcli_64bit_aligned;
     //#define RTCLI_NATIVE_STRING_LENGTH(str) strlen((str))
 #endif
 
-typedef void (*VMMethodPointer)(struct VMStack* stack);
+struct VMStackFrame;
+typedef void (*VMMethodPointer)(struct VMStackFrame* stack);
 
 #ifdef __cplusplus
 }
@@ -85,6 +98,7 @@ namespace RTCLI
     using usize = ::rtcli_usize;
     using isize = ::rtcli_isize;
     using Void = ::rtcli_void;
+    using Byte = ::rtcli_byte;
 #ifdef RTCLI_COMPILER_CPP20
     using c8 = char8_t;
 #else

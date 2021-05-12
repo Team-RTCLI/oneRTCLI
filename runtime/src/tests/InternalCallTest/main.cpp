@@ -47,7 +47,7 @@ int main()
     rtcli_interop_beep(100000, 10);
     rtcli_interop_beep(100000, -10);
 
-    VMArray* array;
+    VMArray* array = nullptr;
     RTCLI::InternalCall::String::Constructor(*string, *array);
 
     return 0;

@@ -2,6 +2,11 @@
 #include "rtcli/base-types.h"
 #include "rtcli/vm/object.h"
 
+struct VMFieldInfo;
+struct VMEventInfo;
+struct VMPropertyInfo;
+struct VMMethodInfo;
+
 typedef struct VMClass
 {
     const char* name;
@@ -16,11 +21,12 @@ typedef struct VMClass
     const struct VMPropertyInfo* properties; 
     uint16_t property_count;
 
-    const struct VMMethodInfo** methods;
+    const struct VMMethodInfo* methods;
     uint16_t method_count;
 
     uint32_t actual_size;
 } VMClass;
+typedef struct VMClass* VMRuntimeTypeHandle;
 
 #ifdef __cplusplus
 

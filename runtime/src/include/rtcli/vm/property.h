@@ -5,8 +5,8 @@ typedef struct VMPropertyInfo
 {
     struct VMClass* parent;
     const char* name;
-    const struct VMMethodInfo *get;
-    const struct VMMethodInfo *set;
+    const struct VMMethodInfo* get;
+    const struct VMMethodInfo* set;
     uint32_t attrs;
     uint32_t token;
 } VMPropertyInfo;

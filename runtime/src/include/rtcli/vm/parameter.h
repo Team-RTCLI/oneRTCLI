@@ -6,5 +6,5 @@ typedef struct VMParameterInfo
     const char* name;
     int32_t position;
     uint32_t token;
-    const struct VMType* parameter_type;
+    const struct VMClass* parameter_type;
 } VMParameterInfo;

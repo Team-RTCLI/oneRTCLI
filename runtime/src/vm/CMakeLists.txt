@@ -1,10 +1,10 @@
 project(RTCLI_VM VERSION 0.0.1)
 
 # 
-set(CLANG_DISABLED_WARNINGS "-Wno-unknown-attributes")
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(
-        ${CLANG_DISABLED_WARNINGS}
+        "-Wno-unknown-attributes" 
+        "-Wno-visibility"
     )
 endif()
 

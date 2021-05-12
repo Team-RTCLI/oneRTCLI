@@ -3,14 +3,9 @@
 #include "rtcli/base-types.h"
 #include "rtcli/vm/object.h"
 
-#ifdef __cplusplus
-typedef struct VMString : public RTCLI::System::__object
-{
-#else
 typedef struct VMString
 {
     rtcli_object object;
-#endif
     rtcli_i32 length;
     rtcli_char chars[RTCLI_ZERO_LEN_ARRAY];
 } VMString;

@@ -4,6 +4,8 @@
 #define METHOD_FLAG_NATIVE 0x00000000000000001
 #define METHOD_FLAG_DYNAMIC 0x00000000000000002
 
+struct VMClass;
+
 typedef struct VMMethodInfo 
 {
     union
@@ -13,7 +15,7 @@ typedef struct VMMethodInfo
     };
     const char* name;
     struct VMClass* klass;
-    const struct VMType* return_type;
+    const struct VMClass* return_type;
 
     const struct VMParameterInfo* parameters;
     rtcli_u8 parameters_count;
