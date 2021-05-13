@@ -228,3 +228,24 @@ void VMStackFrame::StToMemAddr(void* addr, struct VMInterpreterType type)
         *reinterpret_cast<rtcli_i16*>(addr) = OpStackGetValue<rtcli_i16>(ops_ht);
     }
 }
+
+
+void VMInterpreter::Exec(struct VMStackFrame* stack, struct CIL_IL il)
+{
+    switch(il.code)
+    {
+    case CIL_Ldc_I4: return vm_exec_ldc_i4(stack, (rtcli_u32)il.arg);
+    case CIL_Ldc_I4_0: return vm_exec_ldc_i4(stack, 0);
+    case CIL_Ldc_I4_1: return vm_exec_ldc_i4(stack, 1);
+    case CIL_Ldc_I4_2: return vm_exec_ldc_i4(stack, 2);
+    case CIL_Ldc_I4_3: return vm_exec_ldc_i4(stack, 3);
+    case CIL_Ldc_I4_4: return vm_exec_ldc_i4(stack, 4);
+    case CIL_Ldc_I4_5: return vm_exec_ldc_i4(stack, 5);
+    case CIL_Ldc_I4_6: return vm_exec_ldc_i4(stack, 6);
+    case CIL_Ldc_I4_7: return vm_exec_ldc_i4(stack, 7);
+    case CIL_Ldc_I4_8: return vm_exec_ldc_i4(stack, 8);
+
+    default:
+        assert(0 && "not implemented!");    
+    }
+}

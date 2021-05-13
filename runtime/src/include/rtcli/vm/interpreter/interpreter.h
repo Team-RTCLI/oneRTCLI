@@ -1,5 +1,6 @@
 #pragma once
 #include "rtcli/base-types.h"
+#include "rtcli/metadata/method.h"
 #include "rtcli/metadata/class.h"
 #include <stdint.h>
 
@@ -63,6 +64,9 @@ typedef struct VMInterpreter
 {
     struct VMStackFrame* sfs; 
     rtcli_u32 sf_size;
+#ifdef __cplusplus
+    void Exec(struct VMStackFrame* stack, struct CIL_IL il);
+#endif
 } VMInterpreter;
 
 RTCLI_EXTERN_C RTCLI_API void vm_exec_ldarg(struct VMStackFrame* stack, int arg_index);

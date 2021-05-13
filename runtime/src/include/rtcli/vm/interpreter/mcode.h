@@ -1,21 +1,9 @@
 #pragma once
-#include "rtcli/config.h"
+#include "rtcli/cil/opcode.h"
 
-#define CODES \
+#define OPTIMIZED_CODES \
     X(Nop, 0) \
     X(Break, 1) \
-    X(Ldarg_0, 2) \
-    X(Ldarg_1, 3) \
-    X(Ldarg_2, 4) \
-    X(Ldarg_3, 5) \
-    X(Ldloc_0, 6) \
-    X(Ldloc_1, 7) \
-    X(Ldloc_2, 8) \
-    X(Ldloc_3, 9) \
-    X(Stloc_0, 10) \
-    X(Stloc_1, 11) \
-    X(Stloc_2, 12) \
-    X(Stloc_3, 13) \
     X(Ldarg_S, 14) \
     X(Ldarga_S, 15) \
     X(Starg_S, 16) \
@@ -23,17 +11,6 @@
     X(Ldloca_S, 18) \
     X(Stloc_S, 19) \
     X(Ldnull, 20) \
-    X(Ldc_I4_M1, 21) \
-    X(Ldc_I4_0, 22) \
-    X(Ldc_I4_1, 23) \
-    X(Ldc_I4_2, 24) \
-    X(Ldc_I4_3, 25) \
-    X(Ldc_I4_4, 26) \
-    X(Ldc_I4_5, 27) \
-    X(Ldc_I4_6, 28) \
-    X(Ldc_I4_7, 29) \
-    X(Ldc_I4_8, 30) \
-    X(Ldc_I4_S, 31) \
     X(Ldc_I4, 32) \
     X(Ldc_I8, 33) \
     X(Ldc_R4, 34) \
@@ -222,9 +199,7 @@
     X(Refanytype, 217) \
     X(Readonly, 218) 
 
-#define X(a, b) CIL_##a=b,
-typedef enum CIL_OpCode { CODES } CIL_OpCode;
+#define X(a, b) MIL_##a=b,
+typedef enum MIL_OpCode { OPTIMIZED_CODES } MIL_OpCode;
 #undef X
-#undef CODES
-//RTCLI_EXTERN_C RTCLI_API enum CILOpCode CILOpCode_FromString(const char* name) RTCLI_NOEXCEPT;
-//RTCLI_EXTERN_C RTCLI_API const char* CILOpCode_ToString(enum CILOpCode code) RTCLI_NOEXCEPT;
+#undef OPTIMIZED_CODES
