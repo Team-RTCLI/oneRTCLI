@@ -161,7 +161,7 @@ int main()
         .arguments = NULL
     };
     void* args = NULL;
-    struct VMStackFrame stackframe = create_vmstack(&method, args, opstack, 4096);
+    struct VMStackFrame stackframe = create_vm_stackframe(&method, args, opstack, 4096);
     //IL_0001: ldc.i4.5            ML_0001: ldc_i4 5
     vm_exec_ldc_i4(&stackframe, 5);
 	//IL_0002: stloc.0             ML_0002: stloc 0

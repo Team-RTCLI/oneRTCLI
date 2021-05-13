@@ -90,7 +90,7 @@ protected:
 } VMStackFrame;
 
 RTCLI_EXTERN_C RTCLI_API 
-struct VMStackFrame create_vmstack(struct VMInterpreterMethod* method_info, rtcli_byte* args,
+struct VMStackFrame create_vm_stackframe(struct VMInterpreterMethod* method_info, rtcli_byte* args,
     rtcli_byte* frame_memory, rtcli_usize lss_alloc_size);
 
 #ifdef __cplusplus

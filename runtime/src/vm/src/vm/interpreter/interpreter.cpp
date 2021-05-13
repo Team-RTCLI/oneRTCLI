@@ -25,7 +25,7 @@ extern "C"
 
 extern "C"
 {
-    struct VMStackFrame create_vmstack(VMInterpreterMethod* method_info, rtcli_byte* args,
+    struct VMStackFrame create_vm_stackframe(VMInterpreterMethod* method_info, rtcli_byte* args,
         rtcli_byte* frame_memory, rtcli_usize lss_alloc_size)
     {
         rtcli_byte* frame_mem_cursor = frame_memory;
