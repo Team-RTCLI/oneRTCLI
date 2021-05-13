@@ -10,6 +10,11 @@ typedef struct rtcli_object
     rtcli_object_flags m_flags;
 } rtcli_object;
 
+typedef struct VMValueClass 
+{
+
+} VMValueClass;
+
 #ifdef __cplusplus
 
 namespace RTCLI::System
