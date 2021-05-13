@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "assert.h"
 #include "rtcli/base-types.h"
 #include "rtcli/cil/opcode.h"
 #include "rtcli/metadata/class.h"
@@ -177,5 +178,9 @@ int main()
 	vm_exec_add(&stackframe);
     //IL_000c: stloc.0             ML_000c: stloc 0
     vm_exec_stloc(&stackframe, 0);
+    rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
+    rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
+    assert(*calculated_ptr == 512 + 5);
+    rtcli_info("test passed, calculated value: %d", calculated_value);    
     return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 
 extern "C"
 {
@@ -70,15 +71,16 @@ extern "C"
         // Don't decrement "m_curStackHt" early -- if we do, then we'll have a potential GC hole, if
         // the top-of-stack value is a GC ref.
         const auto ind = stack->ops_ht - 1;
+        auto target = stack->FixedSizeLocalSlot(loc_index);
         VMInterpreterType tp = stack->method->locals[loc_index].type;
-
         if(tp.isLargeStruct())
         {
             assert(0);
         }
         else
         {
-            *stack->FixedSizeLocalSlot(loc_index) = stack->OpStackGetValue<rtcli_i64>(ind);
+            const auto value = stack->OpStackGetValue<rtcli_i64>(ind);
+            *target = value;
         }
         stack->ops_ht = ind;
     }
@@ -86,16 +88,16 @@ extern "C"
     void vm_exec_ldloc(struct VMStackFrame* stack, rtcli_i32 loc_index)
     {
         const auto stackHt = stack->ops_ht;
-
-        stack->OpStackSetValue<rtcli_i64>(stackHt, *stack->FixedSizeLocalSlot(loc_index));
+        const auto slot = stack->FixedSizeLocalSlot(loc_index);
+        stack->OpStackSetValue<rtcli_i64>(stackHt, *slot);
         VMInterpreterType tp = stack->method->locals[loc_index].type;
         stack->OpStackSetType(stackHt, tp);
-        stack->ops_ht++;
+        stack->ops_ht = stackHt + 1;
     }
 
     void vm_exec_add(struct VMStackFrame* stack)
     {
-        
+        stack->DoOp<AOp_Add>();
     }
 }
 
