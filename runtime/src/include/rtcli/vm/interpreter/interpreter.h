@@ -14,6 +14,7 @@ public:
 #endif
 } VMInterpreter;
 
+RTCLI_EXTERN_C RTCLI_API void vm_exec_nop(struct VMStackFrame* stack);
 RTCLI_EXTERN_C RTCLI_API void vm_exec_ldarg(struct VMStackFrame* stack, int arg_index);
 RTCLI_EXTERN_C RTCLI_API void vm_exec_ldc_i4(struct VMStackFrame* stack, rtcli_i32 value);
 RTCLI_EXTERN_C RTCLI_API void vm_exec_stloc(struct VMStackFrame* stack, rtcli_i32 loc_index);

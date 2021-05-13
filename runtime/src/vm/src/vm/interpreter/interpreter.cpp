@@ -53,6 +53,11 @@ extern "C"
         return stackframe;
     }
 
+    void vm_exec_nop(struct VMStackFrame* stack)
+    {
+        // Current DoNothing...
+    }
+
     void vm_exec_ldarg(struct VMStackFrame* stack, int arg_index)
     {
         stack->LdFromMemAddr(stack->GetArgAddr(arg_index), stack->GetArgType(arg_index));
@@ -237,14 +242,17 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
 {
     switch(il.code)
     {
-    case MIL_Nop: return;
+    case MIL_Nop: vm_exec_nop(stack); break;
 
-    case MIL_Ldc_I4: return vm_exec_ldc_i4(stack, static_cast<rtcli_i32>(il.arg));
-    case MIL_Ldloc: return vm_exec_ldloc(stack, il.arg);
-    case MIL_Stloc: return vm_exec_stloc(stack, il.arg);
-    case MIL_Add: return vm_exec_add(stack);
+    case MIL_Ldc_I4: 
+    vm_exec_ldc_i4(stack, static_cast<rtcli_i32>(il.arg));
+    break;
+    case MIL_Ldloc: vm_exec_ldloc(stack, il.arg);break;
+    case MIL_Stloc: vm_exec_stloc(stack, il.arg);break;
+    case MIL_Add: vm_exec_add(stack);break;
     default:
-        assert(0 && "not implemented!");    
+        assert(0 && "not implemented!");
+        break;
     }
 }
 
@@ -252,34 +260,37 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
 {
     switch(il.code)
     {
-    case CIL_Nop: return;
+    case CIL_Nop: vm_exec_nop(stack); break;
     
-    case CIL_Ldc_I4: return vm_exec_ldc_i4(stack, static_cast<rtcli_i32>(il.arg));
-    case CIL_Ldc_I4_0: return vm_exec_ldc_i4(stack, 0);
-    case CIL_Ldc_I4_1: return vm_exec_ldc_i4(stack, 1);
-    case CIL_Ldc_I4_2: return vm_exec_ldc_i4(stack, 2);
-    case CIL_Ldc_I4_3: return vm_exec_ldc_i4(stack, 3);
-    case CIL_Ldc_I4_4: return vm_exec_ldc_i4(stack, 4);
-    case CIL_Ldc_I4_5: return vm_exec_ldc_i4(stack, 5);
-    case CIL_Ldc_I4_6: return vm_exec_ldc_i4(stack, 6);
-    case CIL_Ldc_I4_7: return vm_exec_ldc_i4(stack, 7);
-    case CIL_Ldc_I4_8: return vm_exec_ldc_i4(stack, 8);
+    case CIL_Ldc_I4: 
+        vm_exec_ldc_i4(stack, static_cast<rtcli_i32>(il.arg));
+        break;
+    case CIL_Ldc_I4_0: vm_exec_ldc_i4(stack, 0);break;
+    case CIL_Ldc_I4_1: vm_exec_ldc_i4(stack, 1);break;
+    case CIL_Ldc_I4_2: vm_exec_ldc_i4(stack, 2);break;
+    case CIL_Ldc_I4_3: vm_exec_ldc_i4(stack, 3);break;
+    case CIL_Ldc_I4_4: vm_exec_ldc_i4(stack, 4);break;
+    case CIL_Ldc_I4_5: vm_exec_ldc_i4(stack, 5);break;
+    case CIL_Ldc_I4_6: vm_exec_ldc_i4(stack, 6);break;
+    case CIL_Ldc_I4_7: vm_exec_ldc_i4(stack, 7);break;
+    case CIL_Ldc_I4_8: vm_exec_ldc_i4(stack, 8);break;
 
-    case CIL_Ldloc: return vm_exec_ldloc(stack, il.arg);
-    case CIL_Ldloc_0: return vm_exec_ldloc(stack, 0);
-    case CIL_Ldloc_1: return vm_exec_ldloc(stack, 1);
-    case CIL_Ldloc_2: return vm_exec_ldloc(stack, 2);
-    case CIL_Ldloc_3: return vm_exec_ldloc(stack, 3);
+    case CIL_Ldloc: vm_exec_ldloc(stack, il.arg);break;
+    case CIL_Ldloc_0: vm_exec_ldloc(stack, 0);break;
+    case CIL_Ldloc_1: vm_exec_ldloc(stack, 1);break;
+    case CIL_Ldloc_2: vm_exec_ldloc(stack, 2);break;
+    case CIL_Ldloc_3: vm_exec_ldloc(stack, 3);break;
 
-    case CIL_Stloc: return vm_exec_stloc(stack, il.arg);
-    case CIL_Stloc_0: return vm_exec_stloc(stack, 0);
-    case CIL_Stloc_1: return vm_exec_stloc(stack, 1);
-    case CIL_Stloc_2: return vm_exec_stloc(stack, 2);
-    case CIL_Stloc_3: return vm_exec_stloc(stack, 3);
+    case CIL_Stloc: vm_exec_stloc(stack, il.arg);break;
+    case CIL_Stloc_0: vm_exec_stloc(stack, 0);break;
+    case CIL_Stloc_1: vm_exec_stloc(stack, 1);break;
+    case CIL_Stloc_2: vm_exec_stloc(stack, 2);break;
+    case CIL_Stloc_3: vm_exec_stloc(stack, 3);break;
     
-    case CIL_Add: return vm_exec_add(stack);
+    case CIL_Add: vm_exec_add(stack);break;
     default:
         assert(0 && "not implemented!");    
+        break;
     }
 }
 
@@ -288,19 +299,21 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod*
     if(method->optimized_dynamic_method != NULL)
     {
         const auto& optimized = *(method->optimized_dynamic_method);
-        for(auto index = 0; index < optimized.ILs_count; index++)
+        while(stack->ip < optimized.ILs_count)
         {
-            const auto& IL = optimized.ILs[index];
+            const auto& IL = optimized.ILs[stack->ip];
             Exec(stack, IL);
+            stack->ip++;
         }
     }
     else
     {
         const auto& dynamic_method = *(method->method.dynamic_method);
-        for(auto index = 0; index < dynamic_method.ILs_count; index++)
+        while(stack->ip < dynamic_method.ILs_count)
         {
-            const auto& IL = dynamic_method.ILs[index];
+            const auto& IL = dynamic_method.ILs[stack->ip];
             Exec(stack, IL);
+            stack->ip++;
         }
     }
     return;

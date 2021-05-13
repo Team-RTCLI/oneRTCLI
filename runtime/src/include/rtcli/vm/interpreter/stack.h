@@ -18,6 +18,8 @@ typedef struct VMStackFrame
     struct VMInterpreterMethod* method;
     rtcli_byte* args;
 
+    rtcli_usize ip; // ECMA-355-MethodState-IP
+
     rtcli_u64 locals_size;
     struct VMStackOp* ops;
     rtcli_usize ops_ht;
