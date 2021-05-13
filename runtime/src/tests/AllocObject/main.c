@@ -141,10 +141,12 @@ int main()
             .offset = VMInnerActualType_StackSize(VM_INNER_ACTUAL_TYPE_INT)
         }//	[1] int32 b
     };
-    struct VMDynamicMethodBody MainBody = {
+    struct VMCILMethodBody MainBody = {
         .ILs = MainILs,
         .ILs_count = sizeof(MainILs) / sizeof(CIL_IL)
     };
+    struct VMMILMethodBody OptimizedMainBody = {0};
+    optimize_method_body(&MainBody, &OptimizedMainBody);
     struct VMInterpreterMethod method = {
         .method = {
             .name = "Main",
@@ -158,7 +160,8 @@ int main()
         },
         .locals = MainLocals,
         .locals_count = sizeof(MainLocals) / sizeof(*MainLocals),
-        .arguments = NULL
+        .arguments = NULL,
+        .optimized_dynamic_method = &OptimizedMainBody
     };
     void* args = NULL;
     struct VMStackFrame stackframe = create_vm_stackframe(&method, args, opstack, 4096);

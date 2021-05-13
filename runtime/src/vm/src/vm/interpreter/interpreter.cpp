@@ -1,4 +1,5 @@
 #include "rtcli/vm/interpreter/interpreter.h"
+#include "rtcli/vm/interpreter/mcode.h"
 #include "rtcli/vm/interpreter/stack.h"
 
 #include <algorithm>
@@ -232,6 +233,21 @@ void VMStackFrame::StToMemAddr(void* addr, struct VMInterpreterType type)
 }
 
 
+void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
+{
+    switch(il.code)
+    {
+    case MIL_Nop: return;
+
+    case MIL_Ldc_I4: return vm_exec_ldc_i4(stack, static_cast<rtcli_i32>(il.arg));
+    case MIL_Ldloc: return vm_exec_ldloc(stack, il.arg);
+    case MIL_Stloc: return vm_exec_stloc(stack, il.arg);
+    case MIL_Add: return vm_exec_add(stack);
+    default:
+        assert(0 && "not implemented!");    
+    }
+}
+
 void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
 {
     switch(il.code)
@@ -269,11 +285,23 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
 
 void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method)
 {
-    const auto& dynamic_method = *(method->method.dynamic_method);
-    for(auto index = 0; index < dynamic_method.ILs_count; index++)
+    if(method->optimized_dynamic_method != NULL)
     {
-        const auto& IL = dynamic_method.ILs[index];
-        Exec(stack, IL);
+        const auto& optimized = *(method->optimized_dynamic_method);
+        for(auto index = 0; index < optimized.ILs_count; index++)
+        {
+            const auto& IL = optimized.ILs[index];
+            Exec(stack, IL);
+        }
+    }
+    else
+    {
+        const auto& dynamic_method = *(method->method.dynamic_method);
+        for(auto index = 0; index < dynamic_method.ILs_count; index++)
+        {
+            const auto& IL = dynamic_method.ILs[index];
+            Exec(stack, IL);
+        }
     }
     return;
 }

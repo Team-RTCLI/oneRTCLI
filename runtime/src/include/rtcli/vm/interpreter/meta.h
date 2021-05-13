@@ -76,9 +76,18 @@ typedef struct VMInterpreterArgument
     rtcli_u64 offset;
 } VMInterpreterArgument;
 
+
+typedef struct VMMILMethodBody
+{
+    struct MIL_IL* ILs;
+    rtcli_usize ILs_count;
+} VMMILMethodBody;
+
 typedef struct VMInterpreterMethod
 {
     VMMethodInfo method;
+    struct VMMILMethodBody* optimized_dynamic_method;
+
     struct VMInterpreterArgument* arguments;
     struct VMInterpreterLocal* locals;
     rtcli_usize locals_count;
@@ -88,3 +97,6 @@ typedef struct VMInterpreterMethod
     }
 #endif
 } VMInterpreterMethod;
+
+RTCLI_EXTERN_C RTCLI_API 
+void optimize_method_body(const struct VMCILMethodBody* raw, struct VMMILMethodBody* optimized);

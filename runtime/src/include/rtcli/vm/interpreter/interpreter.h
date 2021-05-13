@@ -8,6 +8,7 @@ typedef struct VMInterpreter
     rtcli_u32 sf_size;
 #ifdef __cplusplus
 public:
+    RTCLI_API void Exec(struct VMStackFrame* stack, const struct MIL_IL il);
     RTCLI_API void Exec(struct VMStackFrame* stack, const struct CIL_IL il);
     RTCLI_API void Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method);
 #endif

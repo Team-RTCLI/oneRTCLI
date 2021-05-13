@@ -1,5 +1,5 @@
 #pragma once
-#include "rtcli/config.h"
+#include "rtcli/base-types.h"
 
 #define CODES \
     X(Nop, 0) \
@@ -226,5 +226,12 @@
 typedef enum CIL_OpCode { CODES } CIL_OpCode;
 #undef X
 #undef CODES
+
+typedef struct CIL_IL 
+{
+    enum CIL_OpCode code;
+    rtcli_u64   arg;
+} CIL_IL;
+
 //RTCLI_EXTERN_C RTCLI_API enum CILOpCode CILOpCode_FromString(const char* name) RTCLI_NOEXCEPT;
 //RTCLI_EXTERN_C RTCLI_API const char* CILOpCode_ToString(enum CILOpCode code) RTCLI_NOEXCEPT;

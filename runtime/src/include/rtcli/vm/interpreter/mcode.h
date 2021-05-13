@@ -1,7 +1,6 @@
 #pragma once
+#include "rtcli/base-types.h"
 #include "rtcli/cil/opcode.h"
-
-
 
 #define OPTIMIZED_CODES \
     X(Nop, 0) \
@@ -205,3 +204,13 @@
 typedef enum MIL_OpCode { OPTIMIZED_CODES } MIL_OpCode;
 #undef X
 #undef OPTIMIZED_CODES
+
+typedef struct MIL_IL
+{
+    enum MIL_OpCode code;
+    rtcli_u64 arg;
+} MIL_IL;
+
+RTCLI_EXTERN_C RTCLI_API 
+void optimize_cil_to_mil(const struct CIL_IL* cil, struct MIL_IL* mil);
+

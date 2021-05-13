@@ -7,24 +7,18 @@
 
 struct VMClass;
 
-typedef struct CIL_IL 
-{
-    enum CIL_OpCode code;
-    rtcli_u64   arg;
-} CIL_IL;
-
-typedef struct VMDynamicMethodBody
+typedef struct VMCILMethodBody
 {
     struct CIL_IL* ILs;
     rtcli_usize ILs_count;
-} VMDynamicMethodBody;
+} VMCILMethodBody;
 
 typedef struct VMMethodInfo 
 {
     union
     {
         VMMethodPointer method_pointer;
-        const struct VMDynamicMethodBody* dynamic_method;
+        const struct VMCILMethodBody* dynamic_method;
     };
     const char* name;
     struct VMClass* klass;
