@@ -1,7 +1,13 @@
 #pragma once
 #include "rtcli/base-types.h"
-#include "rtcli/vm/method.h"
+#include "rtcli/metadata/method.h"
 #include "rtcli/vm/interpreter/interpreter.h"
+
+typedef struct VMInterpreterLocal 
+{
+    VMInterpreterType type;
+    rtcli_u64 offset;
+} VMInterpreterLocal;
 
 typedef struct VMInterpreterArgument
 {
@@ -13,6 +19,27 @@ typedef struct VMInterpreterMethod
 {
     VMMethodInfo method;
     struct VMInterpreterArgument* arguments;
+    struct VMInterpreterLocal* locals;
+    rtcli_usize locals_count;
+#ifdef __cplusplus
+    RTCLI_FORCEINLINE rtcli_usize LocalsMemorySize() const
+    {
+        rtcli_usize latest_index = 0;
+        rtcli_usize max_offset = 0;
+        for(rtcli_usize i = 0; i < locals_count; i++)
+        {
+            VMInterpreterLocal& current_local = locals[i];
+            if(max_offset < current_local.offset)
+            {
+                max_offset = current_local.offset;
+                latest_index = i;
+            }
+        }
+        return max_offset + VMInnerActualType_StackSize(
+           locals[latest_index].type.InnerActualType()
+        );
+    }
+#endif
 } VMInterpreterMethod;
 
 typedef struct VMStackOp
@@ -28,14 +55,23 @@ typedef struct VMStackFrame
     struct VMInterpreterMethod* method;
     rtcli_byte* args;
 
+    rtcli_u64 locals_size;
     struct VMStackOp* ops;
     rtcli_usize ops_ht;
+    
+    // local mem ==> |int64|int64|int64|int64|
+    rtcli_byte* local_var_memory;
+#ifdef __cplusplus
+    RTCLI_FORCEINLINE rtcli_i64* FixedSizeLocalSlot(rtcli_usize loc_index)
+    {
+        return reinterpret_cast<rtcli_i64*>(local_var_memory) + loc_index;
+    }
+#endif //__cplusplus
 
     // lss: large struct stack
     rtcli_byte* lss;
     rtcli_usize lss_ht;
     rtcli_usize lss_alloc_size;
-
 #ifdef __cplusplus
     RTCLI_API void LdFromMemAddr(void* addr, struct VMInterpreterType type);
     RTCLI_API void StToMemAddr(void* addr, struct VMInterpreterType type);
@@ -79,6 +115,12 @@ typedef struct VMStackFrame
 protected:
     void LargeStructStackCanPush(rtcli_usize sz);
     void* LargeStructStackPush(rtcli_usize sz);
+
+    RTCLI_FORCEINLINE void LargeStructOperandStackPop(rtcli_usize sz, void* from_addr)
+    {
+        // TODO: check
+        lss_ht -= sz;
+    }
 #endif
 } VMStackFrame;
 

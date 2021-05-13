@@ -15,6 +15,11 @@ extern "C"
     {
         return type.ActualSize();
     }
+
+    void VMInterpreterType_InitFromInnerType(VMInnerActualType inner, VMInterpreterType* type)
+    {
+        new (type) VMInterpreterType(inner);
+    }
 }
 
 extern "C"
@@ -24,13 +29,18 @@ extern "C"
     {
         rtcli_byte* frame_mem_cursor = frame_memory;
         rtcli_byte* initlss = NULL;
-
+        
         if(lss_alloc_size > 0)
         {
             initlss = (rtcli_byte*)malloc(lss_alloc_size);
         }
+
         VMStackFrame stackframe = {0};
         {
+            stackframe.locals_size = method_info->LocalsMemorySize();
+            stackframe.local_var_memory = frame_mem_cursor;
+            frame_mem_cursor += stackframe.locals_size;
+
             stackframe.method = method_info;
             stackframe.ops = (struct VMStackOp*)frame_mem_cursor;
             stackframe.ops_ht = 0;
@@ -50,6 +60,42 @@ extern "C"
     {
         stack->OpStackSetType(stack->ops_ht, VMInterpreterType(VM_INNER_ACTUAL_TYPE_INT));
         stack->OpStackSetValue<rtcli_i32>(stack->ops_ht, value);
+        stack->ops_ht++;
+    }
+
+    void vm_exec_stloc(struct VMStackFrame* stack, rtcli_i32 loc_index)
+    {
+        assert(stack->ops_ht >= 1);
+    
+        // Don't decrement "m_curStackHt" early -- if we do, then we'll have a potential GC hole, if
+        // the top-of-stack value is a GC ref.
+        const auto ind = stack->ops_ht - 1;
+        VMInterpreterType tp = stack->method->locals[loc_index].type;
+
+        if(tp.isLargeStruct())
+        {
+            assert(0);
+        }
+        else
+        {
+            *stack->FixedSizeLocalSlot(loc_index) = stack->OpStackGetValue<rtcli_i64>(ind);
+        }
+        stack->ops_ht = ind;
+    }
+    
+    void vm_exec_ldloc(struct VMStackFrame* stack, rtcli_i32 loc_index)
+    {
+        const auto stackHt = stack->ops_ht;
+
+        stack->OpStackSetValue<rtcli_i64>(stackHt, *stack->FixedSizeLocalSlot(loc_index));
+        VMInterpreterType tp = stack->method->locals[loc_index].type;
+        stack->OpStackSetType(stackHt, tp);
+        stack->ops_ht++;
+    }
+
+    void vm_exec_add(struct VMStackFrame* stack)
+    {
+        
     }
 }
 
@@ -154,7 +200,7 @@ void VMStackFrame::StToMemAddr(void* addr, struct VMInterpreterType type)
             // Large struct case.
             void* srcAddr = OpStackGetValue<void*>(ops_ht);
             memcpy(addr, srcAddr, sz);
-            //LargeStructOperandStackPop(sz, srcAddr);
+            LargeStructOperandStackPop(sz, srcAddr);
         }
         else
         {

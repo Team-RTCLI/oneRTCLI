@@ -15,8 +15,8 @@ typedef struct CIL_IL
 
 typedef struct VMDynamicMethodBody
 {
-    rtcli_byte* ILs;
-    rtcli_usize ILs_size;
+    struct CIL_IL* ILs;
+    rtcli_usize ILs_count;
 } VMDynamicMethodBody;
 
 typedef struct VMMethodInfo 

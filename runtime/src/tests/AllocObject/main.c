@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "rtcli/base-types.h"
 #include "rtcli/cil/opcode.h"
-#include "rtcli/vm/class.h"
+#include "rtcli/metadata/class.h"
 #include "rtcli/vm/object.h"
-#include "rtcli/vm/method.h"
+#include "rtcli/metadata/method.h"
 #include "rtcli/vm/gc.h"
 #include "rtcli/vm/interpreter/interpreter.h"
 #include "rtcli/vm/interpreter/stack.h"
@@ -127,9 +127,21 @@ int main()
         {.code = CIL_Ldloc_0, .arg = 0},
         {.code = CIL_Call, .arg = /*MethodHandle("void [System.Console]System.Console::WriteLine(int32)")*/0},
     };
+    struct VMInterpreterType intType = {0};
+    VMInterpreterType_InitFromInnerType(VM_INNER_ACTUAL_TYPE_INT, &intType);
+    struct VMInterpreterLocal MainLocals[] = {
+        { 
+            .type = intType,
+            .offset = 0
+        },//[0] int32 a,
+		{
+            .type = intType,
+            .offset = VMInnerActualType_StackSize(VM_INNER_ACTUAL_TYPE_INT)
+        }//	[1] int32 b
+    };
     struct VMDynamicMethodBody MainBody = {
-        .ILs = (rtcli_byte*)MainILs,
-        .ILs_size = sizeof(MainILs) / sizeof(CIL_IL)
+        .ILs = MainILs,
+        .ILs_count = sizeof(MainILs) / sizeof(CIL_IL)
     };
     struct VMMethodInfo Main = {
         .name = "Main",
@@ -141,13 +153,29 @@ int main()
         .max_stack = 2,
         .flags = METHOD_FLAG_DYNAMIC
     };
-    VMInterpreterMethod method = {
+    struct VMInterpreterMethod method = {
         .method = Main,
+        .locals = MainLocals,
+        .locals_count = sizeof(MainLocals) / sizeof(*MainLocals),
         .arguments = NULL
     };
     void* args = NULL;
-    VMStackFrame stackframe = create_vmstack(&method, args, opstack, 4096);
-    vm_exec_ldc_i4(&stackframe, 5); //{.code = CIL_Ldc_I4_5, .arg = 5
-    
+    struct VMStackFrame stackframe = create_vmstack(&method, args, opstack, 4096);
+    //IL_0001: ldc.i4.5            ML_0001: ldc_i4 5
+    vm_exec_ldc_i4(&stackframe, 5);
+	//IL_0002: stloc.0             ML_0002: stloc 0
+    vm_exec_stloc(&stackframe, 0); 
+    //IL_0003: ldc.i4 512          ML_0003: ldc_i4 512
+	vm_exec_ldc_i4(&stackframe, 512);
+    //IL_0008: stloc.1             ML_0008: stloc 1
+    vm_exec_stloc(&stackframe, 1);
+    //IL_0009: ldloc.0             ML_0009: ldloc 0
+	vm_exec_ldloc(&stackframe, 0);
+    //IL_000a: ldloc.1             ML_000a: ldloc 1
+	vm_exec_ldloc(&stackframe, 1);
+    //IL_000b: add                 ML_000b: add
+	vm_exec_add(&stackframe);
+    //IL_000c: stloc.0             ML_000c: stloc 0
+    vm_exec_stloc(&stackframe, 0);
     return 0;
 }

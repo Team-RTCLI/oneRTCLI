@@ -1,7 +1,7 @@
 #define DLL_IMPLEMENTATION
 #include "rtcli/vm/gc.h"
 #include "rtcli/vm/object.h"
-#include "rtcli/vm/class.h"
+#include "rtcli/metadata/class.h"
 #include "rtcli/vm/string.h"
 #include "rtcli/vm/array.h"
 #include "rtcli/PIL.h"

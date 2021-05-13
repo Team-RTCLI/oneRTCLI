@@ -1,6 +1,6 @@
 #include "rtcli/base-types.h"
 #define DLL_IMPLEMENTATION
-#include "rtcli/vm/class.h"
+#include "rtcli/metadata/class.h"
 #include "rtcli/vm/string.h"
 #include "assert.h"
 

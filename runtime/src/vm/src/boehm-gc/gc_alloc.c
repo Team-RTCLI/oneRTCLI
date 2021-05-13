@@ -1,7 +1,7 @@
 #define DLL_IMPLEMENTATION
 #include "rtcli/vm/gc.h"
 #include "rtcli/vm/object.h"
-#include "rtcli/vm/class.h"
+#include "rtcli/metadata/class.h"
 
 #ifdef RTCLI_BOEHM_GC
 

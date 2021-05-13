@@ -110,6 +110,11 @@ typedef struct VMClass
 } VMClass;
 typedef struct VMClass* VMRuntimeTypeHandle;
 
+typedef struct VMValueClass 
+{
+
+} VMValueClass;
+
 #ifdef __cplusplus
 
 #endif
