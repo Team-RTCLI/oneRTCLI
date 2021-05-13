@@ -116,17 +116,18 @@ int main()
 	} // end of method Program::Main
     */
     struct CIL_IL MainILs[] = {
-        {.code = CIL_Nop, .arg = 0},
-        {.code = CIL_Ldc_I4_5, .arg = 5},
-        {.code = CIL_Stloc_0, .arg = 0},
-        {.code = CIL_Ldc_I4, .arg = 512},
-        {.code = CIL_Stloc_1, .arg = 0},
-        {.code = CIL_Ldloc_0, .arg = 0},
-        {.code = CIL_Ldloc_1, .arg = 0},
-        {.code = CIL_Add, .arg = 0},
-        {.code = CIL_Stloc_0, .arg = 0},
-        {.code = CIL_Ldloc_0, .arg = 0},
-        {.code = CIL_Call, .arg = /*MethodHandle("void [System.Console]System.Console::WriteLine(int32)")*/0},
+        {.code = CIL_Nop, .arg = 0},      //IL_0000: nop                 ML_0000: nop
+        {.code = CIL_Ldc_I4_5, .arg = 5}, //IL_0001: ldc.i4.5            ML_0001: ldc_i4 5
+        {.code = CIL_Stloc_0, .arg = 0},  //IL_0002: stloc.0             ML_0002: stloc 0
+        {.code = CIL_Ldc_I4, .arg = 512}, //IL_0003: ldc.i4 512          ML_0003: ldc_i4 512
+        {.code = CIL_Stloc_1, .arg = 0},  //IL_0008: stloc.1             ML_0008: stloc 1
+        {.code = CIL_Ldloc_0, .arg = 0},  //IL_0009: ldloc.0             ML_0009: ldloc 0
+        {.code = CIL_Ldloc_1, .arg = 0},  //IL_000a: ldloc.1             ML_000a: ldloc 1
+        {.code = CIL_Add, .arg = 0},      //IL_000b: add                 ML_000b: add
+        {.code = CIL_Stloc_0, .arg = 0}   //IL_000c: stloc.0             ML_000c: stloc 0
+        //,
+        //{.code = CIL_Ldloc_0, .arg = 0},
+        //{.code = CIL_Call, .arg = MethodHandle("Console.WriteLine(int32)")}
     };
     struct VMInterpreterType intType = {0};
     VMInterpreterType_InitFromInnerType(VM_INNER_ACTUAL_TYPE_INT, &intType);
@@ -144,40 +145,25 @@ int main()
         .ILs = MainILs,
         .ILs_count = sizeof(MainILs) / sizeof(CIL_IL)
     };
-    struct VMMethodInfo Main = {
-        .name = "Main",
-        .dynamic_method = &MainBody,
-        .klass = NULL,
-        .return_type = NULL,
-        .parameters = NULL,
-        .parameters_count = 0,
-        .max_stack = 2,
-        .flags = METHOD_FLAG_DYNAMIC
-    };
     struct VMInterpreterMethod method = {
-        .method = Main,
+        .method = {
+            .name = "Main",
+            .dynamic_method = &MainBody,
+            .klass = NULL,
+            .return_type = NULL,
+            .parameters = NULL,
+            .parameters_count = 0,
+            .max_stack = 2,
+            .flags = METHOD_FLAG_DYNAMIC
+        },
         .locals = MainLocals,
         .locals_count = sizeof(MainLocals) / sizeof(*MainLocals),
         .arguments = NULL
     };
     void* args = NULL;
     struct VMStackFrame stackframe = create_vm_stackframe(&method, args, opstack, 4096);
-    //IL_0001: ldc.i4.5            ML_0001: ldc_i4 5
-    vm_exec_ldc_i4(&stackframe, 5);
-	//IL_0002: stloc.0             ML_0002: stloc 0
-    vm_exec_stloc(&stackframe, 0); 
-    //IL_0003: ldc.i4 512          ML_0003: ldc_i4 512
-	vm_exec_ldc_i4(&stackframe, 512);
-    //IL_0008: stloc.1             ML_0008: stloc 1
-    vm_exec_stloc(&stackframe, 1);
-    //IL_0009: ldloc.0             ML_0009: ldloc 0
-	vm_exec_ldloc(&stackframe, 0);
-    //IL_000a: ldloc.1             ML_000a: ldloc 1
-	vm_exec_ldloc(&stackframe, 1);
-    //IL_000b: add                 ML_000b: add
-	vm_exec_add(&stackframe);
-    //IL_000c: stloc.0             ML_000c: stloc 0
-    vm_exec_stloc(&stackframe, 0);
+    VMInterpreter interpreter = {0};
+    interpreter_exec_at_stackframe(&interpreter, &method, &stackframe);
     rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
     rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
     assert(*calculated_ptr == 512 + 5);

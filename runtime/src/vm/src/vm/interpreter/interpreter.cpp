@@ -232,11 +232,13 @@ void VMStackFrame::StToMemAddr(void* addr, struct VMInterpreterType type)
 }
 
 
-void VMInterpreter::Exec(struct VMStackFrame* stack, struct CIL_IL il)
+void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
 {
     switch(il.code)
     {
-    case CIL_Ldc_I4: return vm_exec_ldc_i4(stack, (rtcli_u32)il.arg);
+    case CIL_Nop: return;
+    
+    case CIL_Ldc_I4: return vm_exec_ldc_i4(stack, static_cast<rtcli_i32>(il.arg));
     case CIL_Ldc_I4_0: return vm_exec_ldc_i4(stack, 0);
     case CIL_Ldc_I4_1: return vm_exec_ldc_i4(stack, 1);
     case CIL_Ldc_I4_2: return vm_exec_ldc_i4(stack, 2);
@@ -247,7 +249,45 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, struct CIL_IL il)
     case CIL_Ldc_I4_7: return vm_exec_ldc_i4(stack, 7);
     case CIL_Ldc_I4_8: return vm_exec_ldc_i4(stack, 8);
 
+    case CIL_Ldloc: return vm_exec_ldloc(stack, il.arg);
+    case CIL_Ldloc_0: return vm_exec_ldloc(stack, 0);
+    case CIL_Ldloc_1: return vm_exec_ldloc(stack, 1);
+    case CIL_Ldloc_2: return vm_exec_ldloc(stack, 2);
+    case CIL_Ldloc_3: return vm_exec_ldloc(stack, 3);
+
+    case CIL_Stloc: return vm_exec_stloc(stack, il.arg);
+    case CIL_Stloc_0: return vm_exec_stloc(stack, 0);
+    case CIL_Stloc_1: return vm_exec_stloc(stack, 1);
+    case CIL_Stloc_2: return vm_exec_stloc(stack, 2);
+    case CIL_Stloc_3: return vm_exec_stloc(stack, 3);
+    
+    case CIL_Add: return vm_exec_add(stack);
     default:
         assert(0 && "not implemented!");    
+    }
+}
+
+void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method)
+{
+    const auto& dynamic_method = *(method->method.dynamic_method);
+    for(auto index = 0; index < dynamic_method.ILs_count; index++)
+    {
+        const auto& IL = dynamic_method.ILs[index];
+        Exec(stack, IL);
+    }
+    return;
+}
+
+extern "C"
+{
+    void interpreter_exec(struct VMInterpreter* interpreter, struct VMInterpreterMethod* method)
+    {
+        assert(0 && "not implemented!");
+    }
+
+    void interpreter_exec_at_stackframe(
+        struct VMInterpreter* interpreter, struct VMInterpreterMethod* method, struct VMStackFrame* stackframe)
+    {
+        interpreter->Exec(stackframe, method);
     }
 }
