@@ -227,6 +227,7 @@ int main()
     VMInterpreter interpreter = {0};
     VMInterpreter_Init(&interpreter, 4096);
     VMInterpreter_Exec(&interpreter, &method);
+    VMInterpreter_Destroy(&interpreter);
     //rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
     //rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
     //assert(*calculated_ptr == 512 + 5);

@@ -340,15 +340,30 @@ void VMInterpreter::Exec(struct VMStackFrame* stack,
     return;
 }
 
+VMInterpreter::~VMInterpreter()
+{
+    delete[] sfs;
+}
+
+VMInterpreter::VMInterpreter(rtcli_usize lss_alloc_size)
+{
+    sfs = new VMStackFrame[16];
+    sf_size = 0;
+    sf_capacity = 16;
+    args = nullptr;
+}
+
 extern "C"
 {
     void VMInterpreter_Init(
         struct VMInterpreter* interpreter, rtcli_usize lss_alloc_size)
     {
-        interpreter->sfs = (VMStackFrame*)malloc(sizeof(VMStackFrame) * 16);
-        interpreter->sf_size = 0;
-        interpreter->sf_capacity = 16;
-        interpreter->args = NULL;
+        new (interpreter) VMInterpreter(lss_alloc_size);
+    }
+
+    void VMInterpreter_Destroy(struct VMInterpreter* interpreter)
+    {
+        interpreter->~VMInterpreter();
     }
 
     void VMInterpreter_Exec(struct VMInterpreter* interpreter,
