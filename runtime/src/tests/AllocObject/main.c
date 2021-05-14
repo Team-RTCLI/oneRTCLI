@@ -225,10 +225,12 @@ int main()
         .arguments = NULL,
         .optimized_dynamic_method = &OptimizedMainBody
     };
-    struct VMStackFrame stackframe = create_vm_stackframe(&method, opstack, 4096);
+    struct VMStackFrame stackframe = {0};
+    initialize_vm_stackframe(&stackframe, &method, opstack, 4096);
     VMInterpreter interpreter = {
         .sfs = &stackframe,
         .sf_size = 1,
+        .sf_capacity = 1,
         .args = malloc(sizeof(rtcli_arg_slot) * 1)
     };
     interpreter_exec_at_stackframe(&interpreter, &method, 

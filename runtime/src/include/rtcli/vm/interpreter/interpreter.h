@@ -6,6 +6,8 @@ typedef struct VMInterpreter
 {
     struct VMStackFrame* sfs; 
     rtcli_u32 sf_size;
+    rtcli_u32 sf_capacity;
+
     rtcli_arg_slot* args;
 #ifdef __cplusplus
 public:

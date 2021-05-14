@@ -26,7 +26,8 @@ extern "C"
 
 extern "C"
 {
-    struct VMStackFrame create_vm_stackframe(VMInterpreterMethod* method_info,
+    void initialize_vm_stackframe(
+        VMStackFrame* stackframe, VMInterpreterMethod* method_info,
         rtcli_byte* frame_memory, rtcli_usize lss_alloc_size)
     {
         rtcli_byte* frame_mem_cursor = frame_memory;
@@ -37,19 +38,17 @@ extern "C"
             initlss = (rtcli_byte*)malloc(lss_alloc_size);
         }
 
-        VMStackFrame stackframe = {0};
         {
-            stackframe.locals_size = method_info->LocalsMemorySize();
-            stackframe.local_var_memory = frame_mem_cursor;
-            frame_mem_cursor += stackframe.locals_size;
+            stackframe->locals_size = method_info->LocalsMemorySize();
+            stackframe->local_var_memory = frame_mem_cursor;
+            frame_mem_cursor += stackframe->locals_size;
 
-            stackframe.method = method_info;
-            stackframe.ops = (struct VMStackOp*)frame_mem_cursor;
-            stackframe.ops_ht = 0;
-            stackframe.lss = initlss;
-            stackframe.lss_alloc_size = lss_alloc_size;
+            stackframe->method = method_info;
+            stackframe->ops = (struct VMStackOp*)frame_mem_cursor;
+            stackframe->ops_ht = 0;
+            stackframe->lss = initlss;
+            stackframe->lss_alloc_size = lss_alloc_size;
         }
-        return stackframe;
     }
 
     void vm_exec_nop(struct VMStackFrame* stack)
