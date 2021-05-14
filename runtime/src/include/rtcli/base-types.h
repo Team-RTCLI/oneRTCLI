@@ -27,6 +27,8 @@ typedef size_t rtcli_usize;
 typedef ptrdiff_t rtcli_isize;
 typedef void rtcli_void;
 
+typedef rtcli_i64 rtcli_arg_slot;
+
 #include <stdbool.h>
 typedef bool rtcli_bool;
 
@@ -60,13 +62,16 @@ typedef double rtcli_64bit_aligned;
     typedef uint16_t rtcli_char;
 #endif
 
+#define RTCLI_STRING(str) L##str
+#define RTCLI_STRING_LENGTH(str) wcslen((str))
+
 #ifdef RTCLI_COMPILER_MSVC
     typedef wchar_t rtcli_native_char;
     
     #define RTCLI_NATIVE_STRING(str) L##str
     #define RTCLI_NATIVE_STRING_LENGTH(str) wcslen((str))
 
-    #define RTCLI_STRING_LENGTH(str) ::wcslen((str))
+    #define RTCLI_STRING_LENGTH(str) wcslen((str))
 #else
     typedef char rtcli_native_char;
 

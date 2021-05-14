@@ -16,7 +16,7 @@ typedef struct VMStackOp
 typedef struct VMStackFrame
 {
     struct VMInterpreterMethod* method;
-    rtcli_byte* args;
+    rtcli_arg_slot* args;
 
     rtcli_usize ip; // ECMA-355-MethodState-IP
 
@@ -28,7 +28,7 @@ typedef struct VMStackFrame
     rtcli_byte* local_var_memory;
 #ifdef __cplusplus
     RTCLI_FORCEINLINE rtcli_i64* FixedSizeLocalSlot(rtcli_usize loc_index) {
-        const auto casted = reinterpret_cast<rtcli_i64*>(local_var_memory);
+        const auto casted = reinterpret_cast<rtcli_arg_slot*>(local_var_memory);
         return casted + loc_index;
     }
 #endif //__cplusplus

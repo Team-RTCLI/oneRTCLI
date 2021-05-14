@@ -296,7 +296,7 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
 void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method, rtcli_byte* args)
 {
     // Setup
-    stack->args = args;
+    stack->args = (rtcli_arg_slot*)args;
     
     // Interpreter Method Body
     if(method->optimized_dynamic_method != NULL)

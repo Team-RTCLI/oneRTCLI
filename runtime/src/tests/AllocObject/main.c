@@ -11,6 +11,8 @@
 #include "rtcli/vm/interpreter/stack.h"
 #include "rtcli/detail/log.h"
 
+#include "rtcli/icalls/Console.h"
+
 void RuntimeType_GetType(struct VMStackFrame* stack)
 {
     //rtcli_object* this = *(rtcli_object**)get_at_stack(stack, 0);
@@ -191,6 +193,16 @@ int main()
     rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
     rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
     assert(*calculated_ptr == 512 + 5);
-    rtcli_info("test passed, calculated value: %d", calculated_value);    
+    rtcli_info("test passed, calculated value: %d", calculated_value);  
+
+    const rtcli_char* output 
+        = RTCLI_STRING("This is a piece of output message!");
+    VMString string = {
+        .chars = malloc(sizeof(rtcli_char) * RTCLI_STRING_LENGTH(output)),
+        .length = RTCLI_STRING_LENGTH(output)
+    };
+    memcpy(string.chars, output, sizeof(rtcli_char) * RTCLI_STRING_LENGTH(output));
+    VMInternal_Console_Write(&string);
+
     return 0;
 }
