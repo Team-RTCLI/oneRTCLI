@@ -26,7 +26,7 @@ extern "C"
 
 extern "C"
 {
-    struct VMStackFrame create_vm_stackframe(VMInterpreterMethod* method_info, rtcli_byte* args,
+    struct VMStackFrame create_vm_stackframe(VMInterpreterMethod* method_info,
         rtcli_byte* frame_memory, rtcli_usize lss_alloc_size)
     {
         rtcli_byte* frame_mem_cursor = frame_memory;
@@ -46,7 +46,6 @@ extern "C"
             stackframe.method = method_info;
             stackframe.ops = (struct VMStackOp*)frame_mem_cursor;
             stackframe.ops_ht = 0;
-            stackframe.args = args;
             stackframe.lss = initlss;
             stackframe.lss_alloc_size = lss_alloc_size;
         }
@@ -294,8 +293,12 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
     }
 }
 
-void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method)
+void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method, rtcli_byte* args)
 {
+    // Setup
+    stack->args = args;
+    
+    // Interpreter Method Body
     if(method->optimized_dynamic_method != NULL)
     {
         const auto& optimized = *(method->optimized_dynamic_method);
@@ -321,14 +324,16 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod*
 
 extern "C"
 {
-    void interpreter_exec(struct VMInterpreter* interpreter, struct VMInterpreterMethod* method)
+    void interpreter_exec(struct VMInterpreter* interpreter,
+        struct VMInterpreterMethod* method, rtcli_byte* args)
     {
         assert(0 && "not implemented!");
     }
 
     void interpreter_exec_at_stackframe(
-        struct VMInterpreter* interpreter, struct VMInterpreterMethod* method, struct VMStackFrame* stackframe)
+        struct VMInterpreter* interpreter, struct VMInterpreterMethod* method,
+        rtcli_byte* args, struct VMStackFrame* stackframe)
     {
-        interpreter->Exec(stackframe, method);
+        interpreter->Exec(stackframe, method, args);
     }
 }

@@ -10,7 +10,7 @@ typedef struct VMInterpreter
 public:
     RTCLI_API void Exec(struct VMStackFrame* stack, const struct MIL_IL il);
     RTCLI_API void Exec(struct VMStackFrame* stack, const struct CIL_IL il);
-    RTCLI_API void Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method);
+    RTCLI_API void Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method, rtcli_byte* args);
 #endif
 } VMInterpreter;
 
@@ -22,6 +22,9 @@ RTCLI_EXTERN_C RTCLI_API void vm_exec_ldloc(struct VMStackFrame* stack, rtcli_i3
 RTCLI_EXTERN_C RTCLI_API void vm_exec_add(struct VMStackFrame* stack);
 
 
-RTCLI_EXTERN_C RTCLI_API void interpreter_exec(struct VMInterpreter* interpreter, struct VMInterpreterMethod* method);
+RTCLI_EXTERN_C RTCLI_API void interpreter_exec(
+    struct VMInterpreter* interpreter, struct VMInterpreterMethod* method,
+    rtcli_byte* args);
 RTCLI_EXTERN_C RTCLI_API void interpreter_exec_at_stackframe(
-    struct VMInterpreter* interpreter, struct VMInterpreterMethod* method, struct VMStackFrame* stackframe);
+    struct VMInterpreter* interpreter, struct VMInterpreterMethod* method, 
+    rtcli_byte* args, struct VMStackFrame* stackframe);

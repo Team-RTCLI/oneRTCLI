@@ -185,9 +185,9 @@ int main()
         .optimized_dynamic_method = &OptimizedMainBody
     };
     void* args = NULL;
-    struct VMStackFrame stackframe = create_vm_stackframe(&method, args, opstack, 4096);
+    struct VMStackFrame stackframe = create_vm_stackframe(&method, opstack, 4096);
     VMInterpreter interpreter = {0};
-    interpreter_exec_at_stackframe(&interpreter, &method, &stackframe);
+    interpreter_exec_at_stackframe(&interpreter, &method, args, &stackframe);
     rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
     rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
     assert(*calculated_ptr == 512 + 5);
