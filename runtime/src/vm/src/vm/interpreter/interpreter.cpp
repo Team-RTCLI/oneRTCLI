@@ -238,6 +238,23 @@ void VMStackFrame::StToMemAddr(void* addr, struct VMInterpreterType type)
     }
 }
 
+struct VMStackFrame* VMInterpreter::DiscardStackFrame()
+{
+    VMStackFrame* now = sfs + sf_size - 1;
+    opstack_current -= now->ops_ht;
+    sf_size--;
+    VMStackFrame* last = sfs + sf_size - 1;
+    return last;
+}
+
+struct VMStackFrame* VMInterpreter::NextStackFrame()
+{
+    VMStackFrame* now = sfs + sf_size - 1;
+    opstack_current += now->ops_ht;
+    sf_size++;
+    VMStackFrame* next = sfs + sf_size - 1;
+    return next;
+}
 
 void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
 {
@@ -254,9 +271,13 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
     case MIL_Call: 
     {
         auto oldip = stack->ip;
-        stack->ip = 0;
+        // Next Frame
+        stack = NextStackFrame();
+        // Exec
         Exec(stack, (VMInterpreterMethod*)il.arg, NULL);
-        stack->ip = oldip + 1;
+        // Back Frame
+        stack = DiscardStackFrame();
+        stack->ip++;
         break;
     }
     default:
@@ -308,7 +329,7 @@ void VMInterpreter::Exec(struct VMStackFrame* stack,
     struct VMInterpreterMethod* method, rtcli_arg_slot* args)
 {
     // Setup
-    VMStackFrame_Init(stack, method, opstack, 4096);
+    VMStackFrame_Init(stack, method, opstack_current, 4096);
     stack->args = (rtcli_arg_slot*)args;
     
     // Interpreter Method Body
@@ -347,10 +368,11 @@ VMInterpreter::~VMInterpreter()
 
 VMInterpreter::VMInterpreter(rtcli_usize lss_alloc_size)
 {
-    sfs = new VMStackFrame[16];
+    sfs = new VMStackFrame[16]();
     sf_size = 0;
     sf_capacity = 16;
     args = nullptr;
+    opstack_current = &opstack[0];
 }
 
 extern "C"

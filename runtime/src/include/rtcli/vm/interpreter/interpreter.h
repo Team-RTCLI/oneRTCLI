@@ -9,6 +9,7 @@ typedef struct VMInterpreter
     rtcli_u32 sf_capacity;
 
     rtcli_byte opstack[4096 * 4];
+    rtcli_byte* opstack_current;
 
     rtcli_arg_slot* args;
 #ifdef __cplusplus
@@ -18,6 +19,9 @@ public:
     RTCLI_API void Exec(struct VMStackFrame* stack, const struct MIL_IL il);
     RTCLI_API void Exec(struct VMStackFrame* stack, const struct CIL_IL il);
     RTCLI_API void Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method, rtcli_arg_slot* args);
+protected:
+    struct VMStackFrame* NextStackFrame();
+    struct VMStackFrame* DiscardStackFrame();
 #endif
 } VMInterpreter;
 
