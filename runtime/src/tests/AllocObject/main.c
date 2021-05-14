@@ -115,6 +115,23 @@ int main()
 		IL_0018: ret
 	} // end of method Program::Main
     */
+    struct VMMethodInfo ProgramMethods[1];
+    struct VMClass Program = {
+        .name = "Program",
+        .namespaze = "Test",
+        .fields = NULL,
+        .field_count = 0,
+        .events = NULL,
+        .event_count = 0,
+        .properties = NULL,
+        .property_count = 0,
+        .methods = ProgramMethods,
+        .method_count = 1,
+        .class_type = {
+            .value = 0x0, .actual_value = VM_INNER_ACTUAL_TYPE_CLASS
+        },
+        .actual_size = sizeof(rtcli_object)
+    };
     struct CIL_IL MainILs[] = {
         {.code = CIL_Nop, .arg = 0},      //IL_0000: nop                 ML_0000: nop
         {.code = CIL_Ldc_I4_5, .arg = 5}, //IL_0001: ldc.i4.5            ML_0001: ldc_i4 5
@@ -129,6 +146,23 @@ int main()
         //{.code = CIL_Ldloc_0, .arg = 0},
         //{.code = CIL_Call, .arg = MethodHandle("Console.WriteLine(int32)")}
     };
+    struct VMCILMethodBody MainBody = {
+        .ILs = MainILs,
+        .ILs_count = sizeof(MainILs) / sizeof(CIL_IL)
+    };
+    struct VMMethodInfo Main = {
+        .name = "Main",
+        .dynamic_method = &MainBody,
+        .klass = &Program,
+        .return_type = NULL,
+        .parameters = NULL,
+        .parameters_count = 0,
+        .max_stack = 2,
+        .flags = METHOD_FLAG_DYNAMIC
+    };
+    ProgramMethods[0] = Main;
+    
+    // Interpreter Startup
     struct VMInterpreterType intType = {0};
     VMInterpreterType_InitFromInnerType(VM_INNER_ACTUAL_TYPE_INT, &intType);
     struct VMInterpreterLocal MainLocals[] = {
@@ -141,23 +175,10 @@ int main()
             .offset = VMInnerActualType_StackSize(VM_INNER_ACTUAL_TYPE_INT)
         }//	[1] int32 b
     };
-    struct VMCILMethodBody MainBody = {
-        .ILs = MainILs,
-        .ILs_count = sizeof(MainILs) / sizeof(CIL_IL)
-    };
     struct VMMILMethodBody OptimizedMainBody = {0};
     optimize_method_body(&MainBody, &OptimizedMainBody);
     struct VMInterpreterMethod method = {
-        .method = {
-            .name = "Main",
-            .dynamic_method = &MainBody,
-            .klass = NULL,
-            .return_type = NULL,
-            .parameters = NULL,
-            .parameters_count = 0,
-            .max_stack = 2,
-            .flags = METHOD_FLAG_DYNAMIC
-        },
+        .method = Main,
         .locals = MainLocals,
         .locals_count = sizeof(MainLocals) / sizeof(*MainLocals),
         .arguments = NULL,

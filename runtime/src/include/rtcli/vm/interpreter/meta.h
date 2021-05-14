@@ -6,31 +6,49 @@
 typedef struct VMInterpreterType {
 #ifdef __cplusplus
 public:
+    RTCLI_FORCEINLINE VMInterpreterType(nullptr_t ptr)
+    {
+        rtcli_error("Can't Create InterpreterType With nullptr");
+    } 
     RTCLI_FORCEINLINE VMInterpreterType(VMInnerActualType inner_type) 
-        : vm_inner_type(inner_type), is_inner(true)
+        : vm_inner_type((VMInnerActualType)(0x1 | (inner_type << 2)))
     {
 
     }
     RTCLI_FORCEINLINE VMInterpreterType(VMRuntimeTypeHandle rtType) 
-        : vm_type(rtType), is_inner(false)
+        : vm_type((VMRuntimeTypeHandle)(0x0 | ((rtcli_isize)rtType << 2)))
     {
 
     }
     RTCLI_FORCEINLINE bool isStruct() const 
     {
-        return is_inner ? false : vm_type->isStruct();
+        return is_inner() ? false : TypeHandle()->isStruct();
     }
     RTCLI_FORCEINLINE VMInnerActualType InnerActualType(void) const
     {
-        return is_inner ? vm_inner_type : vm_type->InnerActualType();
+        return is_inner() ? InnerType() : TypeHandle()->InnerActualType();
     }
     RTCLI_FORCEINLINE bool isLargeStruct() const 
     {
-        return is_inner ? false : vm_type->isLargeStruct();
+        return is_inner() ? false : TypeHandle()->isLargeStruct();
     }
     RTCLI_FORCEINLINE rtcli_usize ActualSize() const
     {
-        return is_inner ? VMInnerActualType_ActualSize(vm_inner_type) : vm_type->actual_size;
+        return is_inner() ? 
+            VMInnerActualType_ActualSize(InnerType()) :
+            TypeHandle()->actual_size;
+    }
+    RTCLI_FORCEINLINE VMRuntimeTypeHandle TypeHandle() const
+    {
+        return (VMRuntimeTypeHandle)((rtcli_isize)vm_type >> 2);
+    }
+    RTCLI_FORCEINLINE VMInnerActualType InnerType() const
+    {
+        return (VMInnerActualType)(vm_inner_type >> 2);
+    }
+    RTCLI_FORCEINLINE rtcli_bool is_inner() const
+    {
+        return (vm_type && 0x1) == 0x1;
     }
     RTCLI_FORCEINLINE rtcli_usize SizeOnStack() const
     {
@@ -38,7 +56,7 @@ public:
         {
             return ActualSize();
         } else {
-            return is_inner ? VMInnerActualType_StackSize(vm_inner_type) : sizeof(intptr_t);
+            return is_inner() ? VMInnerActualType_StackSize(InnerType()) : sizeof(intptr_t);
         }
     }
 #endif
@@ -47,7 +65,6 @@ public:
         VMRuntimeTypeHandle vm_type;
         VMInnerActualType   vm_inner_type;
     };
-    rtcli_bool is_inner : 1;
 } VMInterpreterType;
 
 RTCLI_EXTERN_C RTCLI_API 
