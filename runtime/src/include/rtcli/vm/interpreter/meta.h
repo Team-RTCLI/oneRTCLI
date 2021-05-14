@@ -45,7 +45,7 @@ public:
     }
     RTCLI_FORCEINLINE rtcli_bool is_inner() const
     {
-        return (flags && 0x1) == 0x1;
+        return (flags & 0x1) == 0x1;
     }
     RTCLI_FORCEINLINE rtcli_usize SizeOnStack() const
     {
@@ -62,8 +62,8 @@ public:
         rtcli_isize storage;
         struct 
         {
-            rtcli_usize flags : 2;
-            rtcli_isize type : 62;
+            rtcli_u64 flags : 2;
+            rtcli_i64 type : 62;
         };
     };
 
