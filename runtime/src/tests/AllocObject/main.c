@@ -27,7 +27,6 @@ void RuntimeType_Ctor(struct VMStackFrame* stack)
     //rtcli_info("RuntimeType ctor, rc %d", this->m_rc);
 }
 
-rtcli_byte opstack[4096 * 4];
 
 int main()
 {
@@ -225,16 +224,9 @@ int main()
         .arguments = NULL,
         .optimized_dynamic_method = &OptimizedMainBody
     };
-    struct VMStackFrame stackframe = {0};
-    VMStackFrame_Init(&stackframe, &method, opstack, 4096);
-    VMInterpreter interpreter = {
-        .sfs = &stackframe,
-        .sf_size = 1,
-        .sf_capacity = 1,
-        .args = malloc(sizeof(rtcli_arg_slot) * 1)
-    };
-    VMVMInterpreter_ExecAtStackFrame(&interpreter, &method, 
-        (rtcli_byte*)interpreter.args, &stackframe);
+    VMInterpreter interpreter = {0};
+    VMInterpreter_Init(&interpreter, 4096);
+    VMInterpreter_Exec(&interpreter, &method);
     //rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
     //rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
     //assert(*calculated_ptr == 512 + 5);

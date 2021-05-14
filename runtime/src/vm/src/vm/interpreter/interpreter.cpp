@@ -39,6 +39,8 @@ extern "C"
         }
 
         {
+            stackframe->ip = 0;
+
             stackframe->locals_size = method_info->LocalsMemorySize();
             stackframe->local_var_memory = frame_mem_cursor;
             frame_mem_cursor += stackframe->locals_size;
@@ -250,10 +252,13 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
     case MIL_Stloc: vm_exec_stloc(stack, il.arg);break;
     case MIL_Add: vm_exec_add(stack);break;
     case MIL_Call: 
+    {
+        auto oldip = stack->ip;
+        stack->ip = 0;
         Exec(stack, (VMInterpreterMethod*)il.arg, NULL);
-        stack->ip += 1;
+        stack->ip = oldip + 1;
         break;
-
+    }
     default:
         assert(0 && "not implemented!");
         break;
@@ -299,9 +304,11 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
     }
 }
 
-void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method, rtcli_byte* args)
+void VMInterpreter::Exec(struct VMStackFrame* stack,
+    struct VMInterpreterMethod* method, rtcli_arg_slot* args)
 {
     // Setup
+    VMStackFrame_Init(stack, method, opstack, 4096);
     stack->args = (rtcli_arg_slot*)args;
     
     // Interpreter Method Body
@@ -335,15 +342,26 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod*
 
 extern "C"
 {
-    void VMInterpreter_Exec(struct VMInterpreter* interpreter,
-        struct VMInterpreterMethod* method, rtcli_byte* args)
+    void VMInterpreter_Init(
+        struct VMInterpreter* interpreter, rtcli_usize lss_alloc_size)
     {
-        assert(0 && "not implemented!");
+        interpreter->sfs = (VMStackFrame*)malloc(sizeof(VMStackFrame) * 16);
+        interpreter->sf_size = 0;
+        interpreter->sf_capacity = 16;
+        interpreter->args = NULL;
     }
 
-    void VMVMInterpreter_ExecAtStackFrame(
+    void VMInterpreter_Exec(struct VMInterpreter* interpreter,
+        struct VMInterpreterMethod* method)
+    {
+        //assert(0 && "not implemented!");
+        VMInterpreter_ExecAtStackFrame(interpreter, method,
+            interpreter->args, &interpreter->sfs[0]);
+    }
+
+    void VMInterpreter_ExecAtStackFrame(
         struct VMInterpreter* interpreter, struct VMInterpreterMethod* method,
-        rtcli_byte* args, struct VMStackFrame* stackframe)
+        rtcli_arg_slot* args, struct VMStackFrame* stackframe)
     {
         interpreter->Exec(stackframe, method, args);
     }
