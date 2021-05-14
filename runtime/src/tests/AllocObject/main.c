@@ -76,6 +76,42 @@ int main()
         rtcli_info("gc_alloc succeed!");
     }
 
+
+    struct VMMethodInfo InternalConsoleMethods[1];
+    struct VMClass InternalConsole = {
+        .name = "Console",
+        .namespaze = "Internal",
+        .fields = NULL,
+        .field_count = 0,
+        .events = NULL,
+        .event_count = 0,
+        .properties = NULL,
+        .property_count = 0,
+        .methods = InternalConsoleMethods,
+        .method_count = sizeof(InternalConsoleMethods) / sizeof(VMMethodInfo), 
+        .class_type = {
+            .value = 0x0, .actual_value = VM_INNER_ACTUAL_TYPE_CLASS
+        },
+        .actual_size = sizeof(rtcli_object)
+    };
+    struct VMMethodInfo InternalConsoleWriteI32 = {
+        .name = "[System.Console]System.Console::WriteLine(int32)",
+        .method_pointer = &VMInternal_Console_Write_I32,
+        .klass = &InternalConsole,
+        .return_type = NULL,
+        .parameters = NULL,
+        .parameters_count = 0,
+        .max_stack = 0,
+        .flags = METHOD_FLAG_NATIVE
+    };
+    struct VMInterpreterMethod WriteI32Method = {
+        .method = InternalConsoleWriteI32,
+        .locals = NULL,
+        .locals_count = 0,
+        .arguments = NULL,
+        .optimized_dynamic_method = NULL
+    };
+    InternalConsoleMethods[0] = InternalConsoleWriteI32;
     /*
     static void Main()
     {
@@ -144,9 +180,12 @@ int main()
         {.code = CIL_Ldloc_1, .arg = 0},  //IL_000a: ldloc.1             ML_000a: ldloc 1
         {.code = CIL_Add, .arg = 0},      //IL_000b: add                 ML_000b: add
         {.code = CIL_Stloc_0, .arg = 0}   //IL_000c: stloc.0             ML_000c: stloc 0
-        //,
-        //{.code = CIL_Ldloc_0, .arg = 0},
-        //{.code = CIL_Call, .arg = MethodHandle("Console.WriteLine(int32)")}
+        ,
+        {.code = CIL_Ldloc_0, .arg = 0},
+        {
+            .code = CIL_Call, 
+            .arg = (rtcli_isize)(&WriteI32Method)/*MethodHandle("Console.WriteLine(int32)")*/
+        }
     };
     struct VMCILMethodBody MainBody = {
         .ILs = MainILs,
@@ -186,15 +225,19 @@ int main()
         .arguments = NULL,
         .optimized_dynamic_method = &OptimizedMainBody
     };
-    void* args = NULL;
     struct VMStackFrame stackframe = create_vm_stackframe(&method, opstack, 4096);
-    VMInterpreter interpreter = {0};
-    interpreter_exec_at_stackframe(&interpreter, &method, args, &stackframe);
-    rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
-    rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
-    assert(*calculated_ptr == 512 + 5);
-    rtcli_info("test passed, calculated value: %d", calculated_value);  
-
+    VMInterpreter interpreter = {
+        .sfs = &stackframe,
+        .sf_size = 1,
+        .args = malloc(sizeof(rtcli_arg_slot) * 1)
+    };
+    interpreter_exec_at_stackframe(&interpreter, &method, 
+        (rtcli_byte*)interpreter.args, &stackframe);
+    //rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
+    //rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
+    //assert(*calculated_ptr == 512 + 5);
+    //rtcli_info("test passed, calculated value: %d", calculated_value);  
+    /*
     const rtcli_char* output 
         = RTCLI_STRING("This is a piece of output message!");
     VMString string = {
@@ -202,7 +245,8 @@ int main()
         .length = RTCLI_STRING_LENGTH(output)
     };
     memcpy(string.chars, output, sizeof(rtcli_char) * RTCLI_STRING_LENGTH(output));
-    VMInternal_Console_Write(&string);
-
+    VM_Console_Write(&string);
+    VM_Console_Write_I32(12);
+    */
     return 0;
 }

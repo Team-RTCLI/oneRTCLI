@@ -104,6 +104,7 @@ extern "C"
     {
         stack->DoOp<AOp_Add>();
     }
+
 }
 
 void VMStackFrame::LargeStructStackCanPush(rtcli_usize sz)
@@ -249,6 +250,11 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
     case MIL_Ldloc: vm_exec_ldloc(stack, il.arg);break;
     case MIL_Stloc: vm_exec_stloc(stack, il.arg);break;
     case MIL_Add: vm_exec_add(stack);break;
+    case MIL_Call: 
+        Exec(stack, (VMInterpreterMethod*)il.arg, NULL);
+        stack->ip += 1;
+        break;
+
     default:
         assert(0 && "not implemented!");
         break;
@@ -287,6 +293,7 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
     case CIL_Stloc_3: vm_exec_stloc(stack, 3);break;
     
     case CIL_Add: vm_exec_add(stack);break;
+    
     default:
         assert(0 && "not implemented!");    
         break;
@@ -309,7 +316,7 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod*
             stack->ip++;
         }
     }
-    else
+    else if ((method->method.flags & METHOD_FLAG_DYNAMIC) == METHOD_FLAG_DYNAMIC)
     {
         const auto& dynamic_method = *(method->method.dynamic_method);
         while(stack->ip < dynamic_method.ILs_count)
@@ -318,6 +325,11 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod*
             Exec(stack, IL);
             stack->ip++;
         }
+    }
+    else if ((method->method.flags & METHOD_FLAG_NATIVE) == METHOD_FLAG_NATIVE)
+    {
+        const auto& static_method = *(method->method.method_pointer);
+        static_method(stack);
     }
     return;
 }

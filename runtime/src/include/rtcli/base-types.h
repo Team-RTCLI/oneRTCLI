@@ -80,7 +80,7 @@ typedef double rtcli_64bit_aligned;
 #endif
 
 struct VMStackFrame;
-typedef void (*VMMethodPointer)(struct VMStackFrame* stack);
+typedef void (*VMMethodPointer)(struct VMStackFrame* stackframe);
 
 #ifdef __cplusplus
 }

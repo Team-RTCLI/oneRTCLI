@@ -2,7 +2,7 @@
 #include "rtcli/base-types.h"
 #include "rtcli/cil/opcode.h"
 
-#define METHOD_FLAG_NATIVE 0x00000000000000001
+#define METHOD_FLAG_NATIVE  0x00000000000000001
 #define METHOD_FLAG_DYNAMIC 0x00000000000000002
 
 struct VMClass;

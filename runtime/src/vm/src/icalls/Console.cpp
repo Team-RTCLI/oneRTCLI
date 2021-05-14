@@ -2,8 +2,14 @@
 #include <iostream>
 #include <type_traits>
 #include "rtcli/icalls/Console.h"
+#include "rtcli/vm/interpreter/stack.h"
 
 const rtcli_char* nextline = RTCLI_STRING("\n");
+
+void DoWrite(const rtcli_i32 i)
+{
+    std::wcout << i;
+}
 
 void DoWrite(const rtcli_char* s, rtcli_i32 length)
 {
@@ -13,6 +19,11 @@ void DoWrite(const rtcli_char* s, rtcli_i32 length)
     }
     std::wstring_view output = std::wstring_view(s, length);
     std::wcout << output;
+}
+
+void RTCLI::Internal::Console::Write(rtcli_i32 i)
+{
+    DoWrite(i);
 }
 
 void RTCLI::Internal::Console::Write(VMString* s)
@@ -45,12 +56,23 @@ void RTCLI::Internal::Console::WriteLine(VMString& s)
 
 extern "C"
 {
-    void VMInternal_Console_Write(VMString* s)
+    void VM_Console_Write(VMString* s)
     {
         RTCLI::Internal::Console::Write(s);
     }
-    void VMInternal_Console_WriteLine(VMString* s)
+    void VM_Console_Write_I32(rtcli_i32 i)
+    {
+        RTCLI::Internal::Console::Write(i);
+    }
+    void VM_Console_WriteLine(VMString* s)
     {
         RTCLI::Internal::Console::WriteLine(s);
+    }
+
+    void VMInternal_Console_Write_I32(struct VMStackFrame* stackframe)
+    {
+        const auto opidx = stackframe->ops_ht--;
+        auto i = stackframe->OpStackGetValue<rtcli_i32>(opidx);
+        RTCLI::Internal::Console::Write(i);
     }
 }

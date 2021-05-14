@@ -230,7 +230,7 @@ typedef enum CIL_OpCode { CODES } CIL_OpCode;
 typedef struct CIL_IL 
 {
     enum CIL_OpCode code;
-    rtcli_u64   arg;
+    rtcli_isize   arg;
 } CIL_IL;
 
 //RTCLI_EXTERN_C RTCLI_API enum CILOpCode CILOpCode_FromString(const char* name) RTCLI_NOEXCEPT;

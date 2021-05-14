@@ -92,7 +92,7 @@ typedef struct VMInterpreterLocal
 typedef struct VMInterpreterArgument
 {
     VMInterpreterType type;
-    rtcli_u64 offset;
+    rtcli_isize offset;
 } VMInterpreterArgument;
 
 
