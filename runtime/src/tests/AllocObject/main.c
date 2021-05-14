@@ -217,7 +217,7 @@ int main()
         }//	[1] int32 b
     };
     struct VMMILMethodBody OptimizedMainBody = {0};
-    optimize_method_body(&MainBody, &OptimizedMainBody);
+    MethodBody_Optim2MIL(&MainBody, &OptimizedMainBody);
     struct VMInterpreterMethod method = {
         .method = Main,
         .locals = MainLocals,
@@ -226,14 +226,14 @@ int main()
         .optimized_dynamic_method = &OptimizedMainBody
     };
     struct VMStackFrame stackframe = {0};
-    initialize_vm_stackframe(&stackframe, &method, opstack, 4096);
+    VMStackFrame_Init(&stackframe, &method, opstack, 4096);
     VMInterpreter interpreter = {
         .sfs = &stackframe,
         .sf_size = 1,
         .sf_capacity = 1,
         .args = malloc(sizeof(rtcli_arg_slot) * 1)
     };
-    interpreter_exec_at_stackframe(&interpreter, &method, 
+    VMVMInterpreter_ExecAtStackFrame(&interpreter, &method, 
         (rtcli_byte*)interpreter.args, &stackframe);
     //rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
     //rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;

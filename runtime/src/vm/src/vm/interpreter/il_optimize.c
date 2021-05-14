@@ -3,7 +3,7 @@
 #include "rtcli/vm/interpreter/mcode.h"
 #include "rtcli/vm/interpreter/meta.h"
 
-void optimize_cil_to_mil(const struct CIL_IL* cil, struct MIL_IL* mil)
+void CIL_Optim2MIL(const struct CIL_IL* cil, struct MIL_IL* mil)
 {
     // Remove Index in OpCodes for better runtime switch performance
     switch(cil->code)
@@ -39,14 +39,14 @@ void optimize_cil_to_mil(const struct CIL_IL* cil, struct MIL_IL* mil)
     }
 }
 
-void optimize_method_body(const struct VMCILMethodBody* raw, struct VMMILMethodBody* optimized)
+void MethodBody_Optim2MIL(const struct VMCILMethodBody* raw, struct VMMILMethodBody* optimized)
 {
     // Generate Optimized ILs.
     optimized->ILs = (MIL_IL*)malloc(sizeof(MIL_IL) * raw->ILs_count);
     optimized->ILs_count = raw->ILs_count;
     for(rtcli_usize i = 0; i < optimized->ILs_count; i++)
     {
-        optimize_cil_to_mil(&raw->ILs[i], &optimized->ILs[i]);
+        CIL_Optim2MIL(&raw->ILs[i], &optimized->ILs[i]);
     }
     //...
     return;

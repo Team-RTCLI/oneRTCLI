@@ -118,4 +118,4 @@ typedef struct VMInterpreterMethod
 } VMInterpreterMethod;
 
 RTCLI_EXTERN_C RTCLI_API 
-void optimize_method_body(const struct VMCILMethodBody* raw, struct VMMILMethodBody* optimized);
+void MethodBody_Optim2MIL(const struct VMCILMethodBody* raw, struct VMMILMethodBody* optimized);

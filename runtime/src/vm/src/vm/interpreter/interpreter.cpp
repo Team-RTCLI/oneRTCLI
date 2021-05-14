@@ -26,7 +26,7 @@ extern "C"
 
 extern "C"
 {
-    void initialize_vm_stackframe(
+    void VMStackFrame_Init(
         VMStackFrame* stackframe, VMInterpreterMethod* method_info,
         rtcli_byte* frame_memory, rtcli_usize lss_alloc_size)
     {
@@ -335,13 +335,13 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, struct VMInterpreterMethod*
 
 extern "C"
 {
-    void interpreter_exec(struct VMInterpreter* interpreter,
+    void VMInterpreter_Exec(struct VMInterpreter* interpreter,
         struct VMInterpreterMethod* method, rtcli_byte* args)
     {
         assert(0 && "not implemented!");
     }
 
-    void interpreter_exec_at_stackframe(
+    void VMVMInterpreter_ExecAtStackFrame(
         struct VMInterpreter* interpreter, struct VMInterpreterMethod* method,
         rtcli_byte* args, struct VMStackFrame* stackframe)
     {

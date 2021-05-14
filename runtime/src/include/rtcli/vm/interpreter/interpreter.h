@@ -25,10 +25,12 @@ RTCLI_EXTERN_C RTCLI_API void vm_exec_ldloc(struct VMStackFrame* stack, rtcli_i3
 RTCLI_EXTERN_C RTCLI_API void vm_exec_add(struct VMStackFrame* stack);
 //RTCLI_EXTERN_C RTCLI_API void vm_exec_call(struct VMStackFrame* stack, struct VMInterpreterMethod* method);
 
+//RTCLI_EXTERN_C RTCLI_API 
+//void VMInterpreter_Init(rtcli_usize lss_alloc_size);
 
-RTCLI_EXTERN_C RTCLI_API void interpreter_exec(
+RTCLI_EXTERN_C RTCLI_API void VMInterpreter_Exec(
     struct VMInterpreter* interpreter, struct VMInterpreterMethod* method,
     rtcli_byte* args);
-RTCLI_EXTERN_C RTCLI_API void interpreter_exec_at_stackframe(
+RTCLI_EXTERN_C RTCLI_API void VMVMInterpreter_ExecAtStackFrame(
     struct VMInterpreter* interpreter, struct VMInterpreterMethod* method, 
     rtcli_byte* args, struct VMStackFrame* stackframe);

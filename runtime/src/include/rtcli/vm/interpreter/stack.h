@@ -92,7 +92,7 @@ protected:
 } VMStackFrame;
 
 RTCLI_EXTERN_C RTCLI_API 
-void initialize_vm_stackframe(
+void VMStackFrame_Init(
     VMStackFrame* stackframe, VMInterpreterMethod* method_info,
     rtcli_byte* frame_memory, rtcli_usize lss_alloc_size);
 

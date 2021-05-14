@@ -212,5 +212,5 @@ typedef struct MIL_IL
 } MIL_IL;
 
 RTCLI_EXTERN_C RTCLI_API 
-void optimize_cil_to_mil(const struct CIL_IL* cil, struct MIL_IL* mil);
+void CIL_Optim2MIL(const struct CIL_IL* cil, struct MIL_IL* mil);
 
