@@ -3,6 +3,7 @@
 #include <type_traits>
 #include "rtcli/icalls/Console.h"
 #include "rtcli/vm/interpreter/stack.h"
+#include "rtcli/detail/log.h"
 
 const rtcli_char* nextline = RTCLI_STRING("\n");
 
@@ -71,8 +72,8 @@ extern "C"
 
     void VMInternal_Console_Write_I32(struct VMStackFrame* stackframe)
     {
-        const auto opidx = stackframe->ops_ht--;
-        auto i = stackframe->OpStackGetValue<rtcli_i32>(opidx);
+        const auto opidx = 0;
+        auto i = stackframe->GetArg<rtcli_i32>(opidx);
         RTCLI::Internal::Console::Write(i);
     }
 }

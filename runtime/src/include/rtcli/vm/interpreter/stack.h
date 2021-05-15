@@ -16,7 +16,7 @@ typedef struct VMStackOp
 typedef struct VMStackFrame
 {
     struct VMInterpreterMethod* method;
-    rtcli_arg_slot* args;
+    struct VMStackOp* args;
 
     rtcli_usize ip; // ECMA-355-MethodState-IP
 
@@ -41,8 +41,12 @@ typedef struct VMStackFrame
     RTCLI_API void LdFromMemAddr(void* addr, struct VMInterpreterType type);
     RTCLI_API void StToMemAddr(void* addr, struct VMInterpreterType type);
 
+    template<typename T>
+    RTCLI_FORCEINLINE T GetArg(rtcli_usize index) {
+        return *(T*)GetArgAddr(index);
+    }
     RTCLI_FORCEINLINE void* GetArgAddr(rtcli_usize index) {
-        return &args[method->arguments[index].offset];
+        return &args[index];
     }
     RTCLI_FORCEINLINE VMInterpreterType GetArgType(rtcli_usize index) {
         return method->arguments[index].type;
@@ -90,11 +94,6 @@ protected:
     }
 #endif
 } VMStackFrame;
-
-RTCLI_EXTERN_C RTCLI_API 
-void VMStackFrame_Init(
-    VMStackFrame* stackframe, VMInterpreterMethod* method_info,
-    rtcli_byte* frame_memory, rtcli_usize lss_alloc_size);
 
 #ifdef __cplusplus
 #include "rtcli/vm/interpreter/stack.inl"

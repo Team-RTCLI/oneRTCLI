@@ -26,33 +26,6 @@ extern "C"
 
 extern "C"
 {
-    void VMStackFrame_Init(
-        VMStackFrame* stackframe, VMInterpreterMethod* method_info,
-        rtcli_byte* frame_memory, rtcli_usize lss_alloc_size)
-    {
-        rtcli_byte* frame_mem_cursor = frame_memory;
-        rtcli_byte* initlss = NULL;
-        
-        if(lss_alloc_size > 0)
-        {
-            initlss = (rtcli_byte*)malloc(lss_alloc_size);
-        }
-
-        {
-            stackframe->ip = 0;
-
-            stackframe->locals_size = method_info->LocalsMemorySize();
-            stackframe->local_var_memory = frame_mem_cursor;
-            frame_mem_cursor += stackframe->locals_size;
-
-            stackframe->method = method_info;
-            stackframe->ops = (struct VMStackOp*)frame_mem_cursor;
-            stackframe->ops_ht = 0;
-            stackframe->lss = initlss;
-            stackframe->lss_alloc_size = lss_alloc_size;
-        }
-    }
-
     void vm_exec_nop(struct VMStackFrame* stack)
     {
         // Current DoNothing...
@@ -241,7 +214,13 @@ void VMStackFrame::StToMemAddr(void* addr, struct VMInterpreterType type)
 struct VMStackFrame* VMInterpreter::DiscardStackFrame()
 {
     VMStackFrame* now = sfs + sf_size - 1;
-    opstack_current -= now->ops_ht;
+    auto* fmem_start = now->local_var_memory;
+    auto* fmem_end = now->ops + now->ops_ht;
+#if false
+    //set 0xcdcd of old memory
+    memset(fmem_start, 0, (rtcli_byte*)fmem_end - fmem_start);
+#endif
+    opstack_current = fmem_start; // start of frame_memeory
     sf_size--;
     VMStackFrame* last = sfs + sf_size - 1;
     return last;
@@ -249,11 +228,17 @@ struct VMStackFrame* VMInterpreter::DiscardStackFrame()
 
 struct VMStackFrame* VMInterpreter::NextStackFrame()
 {
+    // Root
     VMStackFrame* now = sfs + sf_size - 1;
-    opstack_current += now->ops_ht;
+    opstack_current = (rtcli_byte*)(now->ops + now->ops_ht);
     sf_size++;
     VMStackFrame* next = sfs + sf_size - 1;
     return next;
+}
+
+struct VMStackFrame* VMInterpreter::CurrentStackFrame()
+{
+    return &sfs[sf_size - 1];
 }
 
 void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
@@ -270,14 +255,7 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct MIL_IL il)
     case MIL_Add: vm_exec_add(stack);break;
     case MIL_Call: 
     {
-        auto oldip = stack->ip;
-        // Next Frame
-        stack = NextStackFrame();
-        // Exec
-        Exec(stack, (VMInterpreterMethod*)il.arg, NULL);
-        // Back Frame
-        stack = DiscardStackFrame();
-        stack->ip++;
+        ExecNextStack((VMInterpreterMethod*)il.arg, NULL);
         break;
     }
     default:
@@ -328,10 +306,6 @@ void VMInterpreter::Exec(struct VMStackFrame* stack, const struct CIL_IL il)
 void VMInterpreter::Exec(struct VMStackFrame* stack,
     struct VMInterpreterMethod* method, rtcli_arg_slot* args)
 {
-    // Setup
-    VMStackFrame_Init(stack, method, opstack_current, 4096);
-    stack->args = (rtcli_arg_slot*)args;
-    
     // Interpreter Method Body
     if(method->optimized_dynamic_method != NULL)
     {
@@ -361,6 +335,51 @@ void VMInterpreter::Exec(struct VMStackFrame* stack,
     return;
 }
 
+void VMStackFrame_Init(
+    VMStackFrame* stackframe, VMInterpreterMethod* method_info,
+    rtcli_byte* frame_memory)
+{
+    rtcli_byte* frame_mem_cursor = frame_memory;
+
+    {
+        stackframe->ip = 0;
+
+        stackframe->locals_size = method_info->LocalsMemorySize();
+        stackframe->local_var_memory = frame_mem_cursor;
+        frame_mem_cursor += stackframe->locals_size;
+
+        stackframe->method = method_info;
+        stackframe->ops = (struct VMStackOp*)frame_mem_cursor;
+        stackframe->ops_ht = 0;
+
+        stackframe->lss = NULL;
+        stackframe->lss_alloc_size = 0;
+    }
+}
+
+void VMStackFrame_LoadArgs(VMStackFrame* oldstack, VMStackFrame* sf)
+{
+    const auto argN = sf->method->method.parameters_count;
+    oldstack->ops_ht -= argN;
+    sf->args = oldstack->ops + oldstack->ops_ht - 1;
+}
+
+void VMInterpreter::ExecNextStack(
+    struct VMInterpreterMethod* method, rtcli_arg_slot* args)
+{
+    struct VMStackFrame* oldstack = CurrentStackFrame();
+    auto oldip = oldstack->ip;
+    // Next Frame
+    struct VMStackFrame* stack = NextStackFrame();
+    // Setup
+    VMStackFrame_Init(stack, method, opstack_current);
+    VMStackFrame_LoadArgs(oldstack, stack);
+    // Exec
+    Exec(stack, method, args);
+    // Back Frame
+    stack = DiscardStackFrame();
+}
+
 VMInterpreter::~VMInterpreter()
 {
     delete[] sfs;
@@ -369,10 +388,12 @@ VMInterpreter::~VMInterpreter()
 VMInterpreter::VMInterpreter(rtcli_usize lss_alloc_size)
 {
     sfs = new VMStackFrame[16]();
-    sf_size = 0;
+    sf_size = 1;
     sf_capacity = 16;
     args = nullptr;
     opstack_current = &opstack[0];
+    sfs->ops = (struct VMStackOp*)opstack_current;
+    sfs->ops_ht = 0;
 }
 
 extern "C"
@@ -391,15 +412,9 @@ extern "C"
     void VMInterpreter_Exec(struct VMInterpreter* interpreter,
         struct VMInterpreterMethod* method)
     {
-        //assert(0 && "not implemented!");
-        VMInterpreter_ExecAtStackFrame(interpreter, method,
-            interpreter->args, &interpreter->sfs[0]);
-    }
-
-    void VMInterpreter_ExecAtStackFrame(
-        struct VMInterpreter* interpreter, struct VMInterpreterMethod* method,
-        rtcli_arg_slot* args, struct VMStackFrame* stackframe)
-    {
-        interpreter->Exec(stackframe, method, args);
+        // Setup
+        auto* stack = &interpreter->sfs[interpreter->sf_size - 1];
+        VMStackFrame_Init(stack, method, interpreter->opstack_current);
+        interpreter->Exec(stack, method, NULL);
     }
 }

@@ -19,7 +19,9 @@ public:
     RTCLI_API void Exec(struct VMStackFrame* stack, const struct MIL_IL il);
     RTCLI_API void Exec(struct VMStackFrame* stack, const struct CIL_IL il);
     RTCLI_API void Exec(struct VMStackFrame* stack, struct VMInterpreterMethod* method, rtcli_arg_slot* args);
+    RTCLI_API void ExecNextStack(struct VMInterpreterMethod* method, rtcli_arg_slot* args);
 protected:
+    struct VMStackFrame* CurrentStackFrame();
     struct VMStackFrame* NextStackFrame();
     struct VMStackFrame* DiscardStackFrame();
 #endif
@@ -38,6 +40,3 @@ RTCLI_EXTERN_C RTCLI_API void VMInterpreter_Init(
 RTCLI_EXTERN_C RTCLI_API void VMInterpreter_Destroy(struct VMInterpreter* interpreter);
 RTCLI_EXTERN_C RTCLI_API void VMInterpreter_Exec(
     struct VMInterpreter* interpreter, struct VMInterpreterMethod* method);
-RTCLI_EXTERN_C RTCLI_API void VMInterpreter_ExecAtStackFrame(
-    struct VMInterpreter* interpreter, struct VMInterpreterMethod* method, 
-    rtcli_arg_slot* args, struct VMStackFrame* stackframe);

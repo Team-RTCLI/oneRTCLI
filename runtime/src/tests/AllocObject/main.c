@@ -185,6 +185,12 @@ int main()
             .code = CIL_Call, 
             .arg = (rtcli_isize)(&WriteI32Method)/*MethodHandle("Console.WriteLine(int32)")*/
         }
+        ,
+        {.code = CIL_Ldc_I4_5, .arg = 5},
+        {
+            .code = CIL_Call, 
+            .arg = (rtcli_isize)(&WriteI32Method)/*MethodHandle("Console.WriteLine(int32)")*/
+        }
     };
     struct VMCILMethodBody MainBody = {
         .ILs = MainILs,
