@@ -11,7 +11,6 @@ typedef struct VMInterpreter
     rtcli_byte opstack[4096 * 4];
     rtcli_byte* opstack_current;
 
-    rtcli_arg_slot* args;
 #ifdef __cplusplus
 public:
     VMInterpreter(rtcli_usize lss_alloc_size);

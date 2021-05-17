@@ -6,6 +6,7 @@
 #include "rtcli/metadata/class.h"
 #include "rtcli/vm/object.h"
 #include "rtcli/metadata/method.h"
+#include "rtcli/metadata/module.h"
 #include "rtcli/vm/gc.h"
 #include "rtcli/vm/interpreter/interpreter.h"
 #include "rtcli/vm/interpreter/stack.h"
@@ -156,6 +157,7 @@ int main()
     struct VMClass Program = {
         .name = "Program",
         .namespaze = "Test",
+        .fullname = "Test.Program",
         .fields = NULL,
         .field_count = 0,
         .events = NULL,
@@ -230,10 +232,17 @@ int main()
         .arguments = NULL,
         .optimized_dynamic_method = &OptimizedMainBody
     };
-    VMInterpreter interpreter = {0};
+    struct VMInterpreter interpreter = {0};
     VMInterpreter_Init(&interpreter, 4096);
     VMInterpreter_Exec(&interpreter, &method);
     VMInterpreter_Destroy(&interpreter);
+    
+    struct VMModule module = {0};
+    VMModule_Init(&module);
+    VMModule_InsertClass(&module, &Program);
+    VMRuntimeTypeHandle class_queried = VMModule_GetClass(&module, "Test.Program");
+    rtcli_info(class_queried->fullname);
+
     //rtcli_i64* calculated_ptr = (rtcli_i64*)stackframe.local_var_memory + 0/*slot*/;
     //rtcli_i32 calculated_value = *(rtcli_i32*)calculated_ptr;
     //assert(*calculated_ptr == 512 + 5);

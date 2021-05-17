@@ -11,8 +11,8 @@ typedef struct VMStackOp
     struct VMInterpreterType type;
 } VMStackOp;
 
-// [*-local_mem-*][*--opstack--*]
-// [        frame_memory        ] 
+// [   |  args  ][*-local_mem-*][*--opstack--*]
+// [ last_frame ][        frame_memory        ] 
 typedef struct VMStackFrame
 {
     struct VMInterpreterMethod* method;

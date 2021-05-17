@@ -96,6 +96,7 @@ typedef struct VMClassType {
 
 typedef struct VMClass
 {
+    const char* fullname;
     const char* name;
     const char* namespaze;
 

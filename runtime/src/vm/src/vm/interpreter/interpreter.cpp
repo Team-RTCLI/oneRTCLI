@@ -390,7 +390,6 @@ VMInterpreter::VMInterpreter(rtcli_usize lss_alloc_size)
     sfs = new VMStackFrame[16]();
     sf_size = 1;
     sf_capacity = 16;
-    args = nullptr;
     opstack_current = &opstack[0];
     sfs->ops = (struct VMStackOp*)opstack_current;
     sfs->ops_ht = 0;
